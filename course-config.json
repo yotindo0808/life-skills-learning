@@ -1,8 +1,8 @@
 {
-  "week2": false,
+  "week2": true,
   "maxDay1": 1,
   "maxDay2": 1,
-  "help": "classroom",
+  "help": "routine",
   "seq": true,
   "speed": 0.85
 }
