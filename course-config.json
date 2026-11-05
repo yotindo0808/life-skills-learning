@@ -1,7 +1,7 @@
 {
   "week2": true,
   "maxDay1": 1,
-  "maxDay2": 3,
+  "maxDay2": 5,
   "help": "routine",
   "seq": true,
   "speed": 0.85
