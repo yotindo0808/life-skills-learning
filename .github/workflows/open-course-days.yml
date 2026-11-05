@@ -1,0 +1,78 @@
+name: 教師自行開放課程
+
+on:
+  workflow_dispatch:
+    inputs:
+      week:
+        description: "選擇週次（目前僅正式提供第 1、2 週）"
+        required: true
+        type: choice
+        options:
+          - '1'
+          - '2'
+      last_day:
+        description: "開放到第幾天（含當天）"
+        required: true
+        type: choice
+        options:
+          - '1'
+          - '2'
+          - '3'
+          - '4'
+          - '5'
+          - '6'
+          - '7'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: open-course-days
+  cancel-in-progress: false
+
+jobs:
+  open-days:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: 更新教師課程設定
+        env:
+          WEEK: ${{ inputs.week }}
+          LAST_DAY: ${{ inputs.last_day }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          week = int(os.environ["WEEK"])
+          last_day = int(os.environ["LAST_DAY"])
+          if week not in (1, 2) or not 1 <= last_day <= 7:
+              raise ValueError("不支援的週次或開放天數")
+
+          file = Path("course-config.json")
+          data = json.loads(file.read_text(encoding="utf-8"))
+          data[f"maxDay{week}"] = last_day
+          if week == 2:
+              data["week2"] = True
+
+          file.write_text(
+              json.dumps(data, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          print(f"已設定第 {week} 週開放到第 {last_day} 天")
+          PY
+      - name: 儲存至 GitHub（無變更則略過）
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add course-config.json
+          if git diff --cached --quiet; then
+            echo "教師設定未改變"
+          else
+            git commit -m "Teacher: open selected week through chosen day"
+            git push
+          fi
