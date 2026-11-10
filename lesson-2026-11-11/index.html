@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>大吉｜11 月 11 日當日課程｜生活自立學習站</title>
+<style>
+:root{--ink:#203b45;--teal:#217078;--mint:#e6f3ef;--line:#c7d8d9;--muted:#526872;--bg:#f4f7f6}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);background:var(--bg);font-family:"Noto Sans TC","Microsoft JhengHei","PingFang TC",sans-serif;font-size:18px;line-height:1.55}
+a{color:#17646a}button,input,textarea{font:inherit}button{border:1px solid #9dbdb9;background:white;color:var(--ink);border-radius:12px;padding:11px 15px;cursor:pointer;min-height:46px}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #d89b30;outline-offset:3px}
+button.primary{background:var(--teal);color:#fff;border-color:var(--teal)}button:disabled{opacity:.5;cursor:not-allowed}
+header{background:#fff;border-bottom:2px solid #dae8e6;padding:10px max(14px,calc((100% - 1080px)/2));display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+header strong{font-size:19px}header a{white-space:nowrap}
+main{max-width:1080px;margin:auto;padding:12px 16px 24px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+h1{font-size:24px;line-height:1.3;margin:0 0 5px}h2{font-size:21px;margin:0 0 9px}p{margin:7px 0 11px}.muted{color:var(--muted);font-size:15px}
+.nav{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 13px}.nav button{font-size:15px;padding:8px 12px}.nav button[aria-current="page"]{background:var(--mint);border-color:var(--teal);font-weight:700}
+.card{background:#fff;border:1px solid #dae4e3;border-radius:16px;padding:18px 20px;box-shadow:0 2px 5px #112a3009}
+.twocol{display:grid;grid-template-columns:minmax(0,1.13fr) minmax(0,1fr);gap:14px;align-items:start}
+.context{background:var(--mint);border:1px solid #c1dcd6;border-radius:14px;padding:17px}.context h2{margin:0 0 7px}.context p{font-size:20px;margin:7px 0 10px}
+.mini{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px}
+.pricegrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.pricegrid .mini strong{font-size:24px;display:block}
+.ask{background:#fff;border:1px solid #d6e4e2;border-radius:14px;padding:17px}
+.ask h2{font-size:20px}.choices{display:grid;gap:9px}.choices button{text-align:left;font-size:19px;min-height:50px;padding:10px 14px}
+.field{display:grid;gap:6px;margin-bottom:12px}label{font-weight:700}
+input[type="number"],input[type="text"],textarea{border:2px solid #a8c4c0;border-radius:11px;padding:12px;background:#fff;width:100%;font-size:20px;min-height:48px}
+textarea{resize:vertical;min-height:118px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:13px}.status{padding:9px 12px;border-radius:10px;background:#f4f8f7;color:#204b50;font-size:16px;margin-top:10px}
+.warning{background:#fff4dd;color:#744900}.done{background:#e4f4e8;color:#245338}
+.small{font-size:15px}.progress{font-weight:700;color:var(--teal)}
+@media(max-width:740px){body{font-size:17px}.twocol{grid-template-columns:1fr}h1{font-size:22px}.context p{font-size:18px}.ask{padding:14px}.card{padding:14px}}
+@media(orientation:landscape) and (min-width:741px) and (max-height:760px){main{padding-top:8px}.card{padding:12px 15px}.context,.ask{padding:13px}.context p{font-size:18px}.nav{margin:5px 0 8px}.choices button{min-height:44px;padding:7px 10px}}
+</style></head>
+<body><header><strong>生活自立學習站｜大吉的當日課程</strong><a href="../">返回原網站首頁</a></header>
+<main><div class="top"><div><h1>11 月 11 日（三）｜看懂標價、加減乘練習</h1><div class="muted">模擬商品與價格；依照紙本學習單練習，不取代教師的實際觀察。</div></div><span id="totalProgress" class="progress"></span></div>
+<nav class="nav" aria-label="選擇當日學習任務">
+<button type="button" id="tabPrice" onclick="switchTab('price')">① 讀標價</button>
+<button type="button" id="tabMath" onclick="switchTab('math')">② 數學八題</button>
+<button type="button" id="tabReport" onclick="switchTab('report')">③ 說明與打字</button>
+</nav>
+<div id="lesson" aria-live="polite"></div></main>
+<script>
+"use strict";
+const QUESTIONS=[
+ {id:"M1",text:"飯糰 35 元、豆漿 30 元，各買 1 個，總共多少元？",kind:"add",amount:65,accept:["35+30","30+35"],explain:"兩種不同商品的價錢合在一起。"},
+ {id:"M2",text:"鉛筆每枝 10 元，買 3 枝，總共多少元？",kind:"mul",amount:30,accept:["10*3","3*10","10+10+10"],explain:"每枝 10 元，共 3 枝，先用 10＋10＋10 表示也可以。"},
+ {id:"M3",text:"大吉帶 100 元，買 45 元午餐，還剩多少元？",kind:"sub",amount:55,accept:["100-45"],explain:"從原本的 100 元扣掉花出去的 45 元。"},
+ {id:"M4",text:"礦泉水每瓶 20 元，買 3 瓶，總共多少元？",kind:"mul",amount:60,accept:["20*3","3*20","20+20+20"],explain:"每瓶 20 元，共 3 瓶，可以先用連加表示。"},
+ {id:"M5",text:"麵包 25 元、牛奶 35 元，各買 1 個，共多少元？",kind:"add",amount:60,accept:["25+35","35+25"],explain:"把兩種商品的價錢合計。"},
+ {id:"M6",text:"筆記本每本 30 元，買 2 本，共多少元？",kind:"mul",amount:60,accept:["30*2","2*30","30+30"],explain:"每本 30 元，共 2 本，可以用 30＋30 表示。"},
+ {id:"M7",text:"拿 100 元買 70 元的雨傘，找回多少元？",kind:"sub",amount:30,accept:["100-70"],explain:"付款 100 元，再扣掉商品價格 70 元。"},
+ {id:"M8",text:"口罩每盒 15 元，買 3 盒，總共多少元？",kind:"mul",amount:45,accept:["15*3","3*15","15+15+15"],explain:"每盒 15 元，共 3 盒，可以用 15＋15＋15 表示。"}
+];
+const STORAGE="life-lesson-2026-11-11-v1";
+let state={priceDone:false,answers:{},report:""};
+try{
+ const old=JSON.parse(localStorage.getItem(STORAGE)||"{}");
+ if(old&&typeof old==="object"){state.priceDone=!!old.priceDone;state.answers=old.answers&&typeof old.answers==="object"?old.answers:{};state.report=typeof old.report==="string"?old.report:"";}
+}catch(e){}
+let tab="price",idx=0,feedback="";
+function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state))}catch(e){console.warn("本裝置暫時不能儲存練習紀錄",e)}}
+function esc(s){return String(s).replace(/[&<>"']/g,function(x){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[x]})}
+function speak(t){try{if(!("speechSynthesis" in window))return alert("目前瀏覽器不支援朗讀。");speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="zh-TW";u.rate=.85;speechSynthesis.speak(u)}catch(e){alert("朗讀功能暫時無法使用。")}}
+function switchTab(t){if(!["price","math","report"].includes(t))return;tab=t;feedback="";render()}
+function render(){
+ for(const name of ["Price","Math","Report"]){let node=document.getElementById("tab"+name);node.setAttribute("aria-current",tab===name.toLowerCase()?"page":"false")}
+ const done=QUESTIONS.filter(q=>state.answers[q.id]&&state.answers[q.id].done).length;
+ document.getElementById("totalProgress").textContent="數學完成 "+done+"／8 題";
+ document.getElementById("lesson").innerHTML=tab==="price"?pricePage():tab==="math"?mathPage():reportPage();
+}
+function pricePage(){
+ return '<section class="card"><div class="twocol"><div class="context"><h2>先看清楚標價</h2><p>大吉要買 1 個飯糰和 1 瓶無糖豆漿。他帶了 100 元。</p><div class="pricegrid"><div class="mini">飯糰（1 個）<strong>35 元</strong></div><div class="mini">無糖豆漿（1 瓶）<strong>30 元</strong></div></div><div class="toolbar"><button onclick="speak(\'大吉要買一個飯糰，三十五元，和一瓶無糖豆漿，三十元。他帶了一百元。\')">🔊 聽情境</button></div></div><div class="ask"><h2>找出關鍵資訊</h2><p>請先讀左邊的標價，再填入數字。</p><div class="field"><label for="price1">飯糰多少元？</label><input id="price1" type="number" inputmode="numeric" value="'+(state.priceDone?"35":"")+'"></div><div class="field"><label for="price2">豆漿多少元？</label><input id="price2" type="number" inputmode="numeric" value="'+(state.priceDone?"30":"")+'"></div><div class="toolbar"><button class="primary" onclick="checkPrice()">核對標價</button><button onclick="switchTab(\'math\')">前往數學八題</button></div>'+(feedback?'<div class="status '+(state.priceDone?"done":"warning")+'">'+esc(feedback)+'</div>':"")+'</div></div></section>';
+}
+function checkPrice(){
+ const a=document.getElementById("price1").value,b=document.getElementById("price2").value;
+ if(a!==""&&b!==""&&Number(a)===35&&Number(b)===30){state.priceDone=true;save();feedback="找對兩項價格，可以開始數學練習。"}else feedback="請回到左側包裝標價，核對兩項價格。";
+ render();
+}
+function answer(q){if(!state.answers[q.id]||typeof state.answers[q.id]!=="object")state.answers[q.id]={stage:"method",tries:0,done:false};return state.answers[q.id]}
+function mathPage(){
+ const q=QUESTIONS[idx],p=answer(q),status=(feedback?'<div class="status '+(p.done?"done":"warning")+'" role="status">'+esc(feedback)+'</div>':"");
+ let right="";
+ if(p.done){
+   right='<h2>已完成這一題</h2><div class="status done">算式：'+esc(p.formula||"")+'，答案：'+q.amount+' 元。</div><p>'+esc(q.explain)+'</p><div class="toolbar"><button onclick="redo()">重新練習此題</button><button class="primary" onclick="nextMath()">'+(idx===7?"查看完成狀態":"下一題")+'</button></div>';
+ }else if(p.stage==="compute"){
+   right='<h2>第二步：自己列算式</h2><p class="small">可用連加表示相同價格的多份商品。先列式，再用計算機核對。</p><div class="field"><label for="expr">算式（可輸入 +、-、× 或 *）</label><input id="expr" type="text" autocapitalize="off" autocomplete="off" placeholder="先寫出算式"></div><div class="field"><label for="amount">答案（元）</label><input id="amount" type="number" inputmode="numeric" placeholder="輸入金額"></div><button class="primary" onclick="checkMath()">核對算式與答案</button> <button onclick="backMethod()">重選運算</button>'+status;
+ }else{
+   right='<h2>第一步：需要哪一種運算？</h2><p class="small">讀完左邊情境，再判斷運算。先不要按計算機。</p><div class="choices"><button onclick="chooseMethod(\'add\')">＋ 加法</button><button onclick="chooseMethod(\'sub\')">－ 減法</button><button onclick="chooseMethod(\'mul\')">× 乘法</button></div>'+status;
+ }
+ return '<section class="card"><div class="twocol"><div class="context"><div class="progress">第 '+(idx+1)+'／8 題</div><h2>看情境，想一想</h2><p>'+esc(q.text)+'</p><button onclick="speak(QUESTIONS['+idx+'].text)">🔊 聽題目</button><p class="small muted">先找出商品單價、數量或原本的金額。</p></div><div class="ask">'+right+'</div></div><div class="toolbar"><button onclick="prevMath()" '+(idx===0?"disabled":"")+'>上一題</button><button onclick="nextMath()">下一題／先跳過</button><button onclick="switchTab(\'report\')">說明與打字</button></div></section>';
+}
+function chooseMethod(method){
+ const q=QUESTIONS[idx],p=answer(q);
+ if(method!==q.kind){p.tries=(p.tries||0)+1;feedback="再讀一次情境：是在合計不同商品、同價買多份，還是扣掉花費？";save();render();return}
+ p.method=method;p.stage="compute";save();feedback="";render();
+}
+function backMethod(){let p=answer(QUESTIONS[idx]);p.stage="method";save();feedback="";render()}
+function normExpr(s){return String(s).replace(/\s/g,"").replace(/＋/g,"+").replace(/[－−]/g,"-").replace(/[×xX＊]/g,"*").replace(/＝.*$/,"")}
+function checkMath(){
+ const q=QUESTIONS[idx],p=answer(q),expr=document.getElementById("expr").value,raw=document.getElementById("amount").value;
+ const normalized=normExpr(expr);
+ if(!q.accept.includes(normalized)){p.tries=(p.tries||0)+1;feedback="請再檢查算式。乘法也可以先用相同價錢的連加表示。";save();render();return}
+ if(raw===""||Number(raw)!==q.amount){p.tries=(p.tries||0)+1;feedback="算式的方向對了，請再核對計算結果。";save();render();return}
+ p.done=true;p.stage="done";p.formula=expr.trim();p.amount=q.amount;save();feedback="";render();
+}
+function redo(){state.answers[QUESTIONS[idx].id]={stage:"method",tries:0,done:false};save();feedback="";render()}
+function prevMath(){idx=Math.max(0,idx-1);feedback="";render()}
+function nextMath(){if(idx<7){idx++;feedback="";render()}else{tab="report";feedback="";render()}}
+function reportPage(){
+ const done=QUESTIONS.filter(q=>state.answers[q.id]&&state.answers[q.id].done).length;
+ return '<section class="card"><div class="twocol"><div class="context"><h2>第三步：說明與打字回報</h2><p>從數學題中選一題，向老師說明：</p><div class="mini">我買了什麼？每件多少元？買了幾件？為什麼要用這個算法？</div><p class="small">若是乘法題，可先說出相同價錢的連加。先用口說，再練習用注音打字。</p><div class="status">數學已完成 '+done+'／8 題。可分次完成，不必一次做完。</div></div><div class="ask"><h2>我的購物回報</h2><label for="reportText">請用自己的話寫一句話</label><textarea id="reportText" maxlength="500" placeholder="例如：我買了……，總共……元。" oninput="saveReport(this.value)">'+esc(state.report)+'</textarea><div class="toolbar"><button class="primary" onclick="saveReport(document.getElementById(\'reportText\').value);showSaved()">儲存這段文字</button><button onclick="switchTab(\'math\')">返回數學題</button></div><p class="muted">目前只儲存在這台裝置的瀏覽器，沒有傳送給老師。請在課堂上開啟讓老師查看；不要輸入個人資料。</p><div id="reportSaved" aria-live="polite"></div></div></div></section>';
+}
+function saveReport(t){state.report=String(t).slice(0,500);save()}
+function showSaved(){let node=document.getElementById("reportSaved");if(node)node.innerHTML='<div class="status done">已儲存在這台裝置。請讓老師查看文字內容。</div>'}
+render();
+</script></body></html>
