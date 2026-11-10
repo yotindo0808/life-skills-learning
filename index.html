@@ -129,6 +129,8 @@ function sectionLinks(w,d,full=false){
 function showHome(){
  let notice=courseStatus==='offline'?'<p class="warning">教師設定目前無法更新，暫時只開放第 1 週第 1 天。</p>':courseStatus==='preview'?'<p class="warning">教師預覽模式：此測試檔可開啟全部 14 天，正式網站仍按教師設定開放。</p>':'';
  let html=`<section class="card"><h1>每天固定的學習</h1><div class="step">☑ 選擇練習日期 ${voice('選擇練習日期')}</div><p>建議依照 A、B、C、D、E、F 練習，也可以直接選擇需要的區塊。</p><p class="muted">教師會逐步開放練習日期。學生與家長不需設定教師密碼。</p>${notice}</section>`;
+
+ html+=`<section class="card" style="border:2px solid #217078"><h2>11／11（三）｜大吉的當日課程</h2><p>看懂標價、加減乘混合練習（8 題）、口說與打字回報。</p><p class="muted">這是日期專用練習，不會覆蓋第一、二週的原本題目及完成紀錄。教材金額均為模擬。</p><a href="./lesson-2026-11-11/" style="display:inline-block;background:#217078;color:white;text-decoration:none;border-radius:11px;padding:13px 20px;font-weight:bold">開始 11／11 課程</a></section>`;
  for(const w of [1,2]){
   html+=`<section class="card"><h2>第 ${w} 週｜${w===1?'小安去活動中心':'小安在活動中心求助'} ${w===2&&!courseSettings.week2?'<span class="pill">尚未開放</span>':''}</h2><div class="tiles">`;
   for(let d=1;d<=7;d++){
