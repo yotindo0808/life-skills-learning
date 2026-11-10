@@ -81,7 +81,7 @@ function mathPage(){
  if(p.done){
    right='<h2>已完成這一題</h2><div class="status done">算式：'+esc(p.formula||"")+'，答案：'+q.amount+' 元。</div><p>'+esc(q.explain)+'</p><div class="toolbar"><button onclick="redo()">重新練習此題</button><button class="primary" onclick="nextMath()">'+(idx===7?"查看完成狀態":"下一題")+'</button></div>';
  }else if(p.stage==="compute"){
-   right='<h2>第二步：自己列算式</h2><p class="small">可用連加表示相同價格的多份商品。先列式，再用計算機核對。</p><div class="field"><label for="expr">算式（可輸入 +、-、× 或 *）</label><input id="expr" type="text" autocapitalize="off" autocomplete="off" placeholder="先寫出算式"></div><div class="field"><label for="amount">答案（元）</label><input id="amount" type="number" inputmode="numeric" placeholder="輸入金額"></div><button class="primary" onclick="checkMath()">核對算式與答案</button> <button onclick="backMethod()">重選運算</button>'+status;
+   right='<h2>第二步：自己列算式</h2><p class="small">可用連加表示相同價格的多份商品。先列式，再用計算機核對。</p><div class="field"><label for="expr">算式（可輸入 +、-、× 或 *）</label><input id="expr" type="text" autocapitalize="off" autocomplete="off" placeholder="先寫出算式" value="'+esc(p.draftFormula||"")+'"></div><div class="field"><label for="amount">答案（元）</label><input id="amount" type="number" inputmode="numeric" placeholder="輸入金額" value="'+esc(p.draftAmount||"")+'"></div><button class="primary" onclick="checkMath()">核對算式與答案</button> <button onclick="backMethod()">重選運算</button>'+status;
  }else{
    right='<h2>第一步：需要哪一種運算？</h2><p class="small">讀完左邊情境，再判斷運算。先不要按計算機。</p><div class="choices"><button onclick="chooseMethod(\'add\')">＋ 加法</button><button onclick="chooseMethod(\'sub\')">－ 減法</button><button onclick="chooseMethod(\'mul\')">× 乘法</button></div>'+status;
  }
@@ -96,7 +96,7 @@ function backMethod(){let p=answer(QUESTIONS[idx]);p.stage="method";save();feedb
 function normExpr(s){return String(s).replace(/\s/g,"").replace(/＋/g,"+").replace(/[－−]/g,"-").replace(/[×xX＊]/g,"*").replace(/＝.*$/,"")}
 function checkMath(){
  const q=QUESTIONS[idx],p=answer(q),expr=document.getElementById("expr").value,raw=document.getElementById("amount").value;
- const normalized=normExpr(expr);
+ p.draftFormula=expr;p.draftAmount=raw;const normalized=normExpr(expr);
  if(!q.accept.includes(normalized)){p.tries=(p.tries||0)+1;feedback="請再檢查算式。乘法也可以先用相同價錢的連加表示。";save();render();return}
  if(raw===""||Number(raw)!==q.amount){p.tries=(p.tries||0)+1;feedback="算式的方向對了，請再核對計算結果。";save();render();return}
  p.done=true;p.stage="done";p.formula=expr.trim();p.amount=q.amount;save();feedback="";render();
