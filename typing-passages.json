@@ -28,35 +28,40 @@
           "tone": 1,
           "word": "通知",
           "audioText": "通知",
-          "targetIndex": 0
+          "targetIndex": 0,
+          "question": "「通知」的「通」是第幾聲？"
         },
         {
           "char": "期",
           "tone": 2,
           "word": "星期",
           "audioText": "星期",
-          "targetIndex": 1
+          "targetIndex": 1,
+          "question": "「星期」的「期」是第幾聲？"
         },
         {
           "char": "改",
           "tone": 3,
           "word": "改成",
           "audioText": "改成",
-          "targetIndex": 0
+          "targetIndex": 0,
+          "question": "「改成」的「改」是第幾聲？"
         },
         {
           "char": "訊",
           "tone": 4,
           "word": "訊息",
           "audioText": "訊息",
-          "targetIndex": 0
+          "targetIndex": 0,
+          "question": "「訊息」的「訊」是第幾聲？"
         },
         {
           "char": "的",
           "tone": 0,
           "word": "的活動",
           "audioText": "我的",
-          "targetIndex": 1
+          "targetIndex": 1,
+          "question": "「我的」裡面的「的」是第幾聲？"
         }
       ]
     },
@@ -87,35 +92,40 @@
           "tone": 1,
           "word": "先說",
           "audioText": "先說",
-          "targetIndex": 0
+          "targetIndex": 0,
+          "question": "「先說」的「先」是第幾聲？"
         },
         {
           "char": "完",
           "tone": 2,
           "word": "完成",
           "audioText": "完成",
-          "targetIndex": 0
+          "targetIndex": 0,
+          "question": "「完成」的「完」是第幾聲？"
         },
         {
           "char": "想",
           "tone": 3,
           "word": "想把",
           "audioText": "想說",
-          "targetIndex": 0
+          "targetIndex": 0,
+          "question": "「想說」的「想」是第幾聲？"
         },
         {
           "char": "課",
           "tone": 4,
           "word": "手作課",
           "audioText": "手作課",
-          "targetIndex": 2
+          "targetIndex": 2,
+          "question": "「手作課」的「課」是第幾聲？"
         },
         {
           "char": "媽",
           "tone": 0,
           "word": "媽媽的第二個字",
           "audioText": "媽媽",
-          "targetIndex": 1
+          "targetIndex": 1,
+          "question": "「媽媽」的第二個「媽」是第幾聲？"
         }
       ]
     },
@@ -146,35 +156,40 @@
           "tone": 1,
           "word": "分享",
           "audioText": "分享",
-          "targetIndex": 0
+          "targetIndex": 0,
+          "question": "「分享」的「分」是第幾聲？"
         },
         {
           "char": "輪",
           "tone": 2,
           "word": "輪流",
           "audioText": "輪流",
-          "targetIndex": 0
+          "targetIndex": 0,
+          "question": "「輪流」的「輪」是第幾聲？"
         },
         {
           "char": "館",
           "tone": 3,
           "word": "博物館",
           "audioText": "博物館",
-          "targetIndex": 2
+          "targetIndex": 2,
+          "question": "「博物館」的「館」是第幾聲？"
         },
         {
           "char": "話",
           "tone": 4,
           "word": "說話",
           "audioText": "說話",
-          "targetIndex": 1
+          "targetIndex": 1,
+          "question": "「說話」的「話」是第幾聲？"
         },
         {
           "char": "的",
           "tone": 0,
           "word": "看的故事",
           "audioText": "看的",
-          "targetIndex": 1
+          "targetIndex": 1,
+          "question": "「看的」裡面的「的」是第幾聲？"
         }
       ]
     }
