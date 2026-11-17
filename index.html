@@ -196,6 +196,13 @@ function typingCheckCopy(){
   typingProgress().copyDone=true;typingSaveProgress();typingStatus={message:'短文內容核對完成。接下來可以試著只聽一句再打。',type:'good'};render();
  }else typingSetStatus('文字還有差異。請看看注音或顯示漢字提示，再修改後核對。');
 }
+function typingDictHalves(text){
+ const chars=[...text];
+ const middle=Math.floor(chars.length/2);
+ const stops=chars.map((ch,i)=>ch==='，'?i+1:-1).filter(i=>i>4&&i<chars.length-4);
+ const cut=stops.length?stops.sort((a,b)=>Math.abs(a-middle)-Math.abs(b-middle))[0]:middle;
+ return [chars.slice(0,cut).join(''),chars.slice(cut).join('')];
+}
 function typingDictNext(amount){
  const count=typingLesson().lines.length;
  typingLineIndex=Math.max(0,Math.min(count-1,typingLineIndex+amount));
@@ -275,10 +282,10 @@ function renderAnnotatedTyping(){
   '<textarea id="typingCopyInput" class="zh-input" rows="6" autocomplete="off" spellcheck="false" oninput="typingInput(\'copy\',this.value)">'+esc(typingValue('copy'))+'</textarea>'+
   '<div class="toolbar"><button class="primary" onclick="typingCheckCopy()">核對整篇文字</button><button onclick="showTypingMode(\'dict\')">前往聽打練習</button></div>';
  }else if(typingMode==='dict'){
-  const line=lesson.lines[typingLineIndex];
+  const line=lesson.lines[typingLineIndex],halves=typingDictHalves(line.t);
   h+='<h2>聽一句，再把這一句打出來</h2>'+
-   '<p>第 '+(typingLineIndex+1)+'／'+lesson.lines.length+' 句。先聽聲音、記住內容，再打字。需要時可重播；聽完不會自動顯示漢字。</p>'+
-   '<div class="toolbar">'+voice(line.t,'🔊 播放這一句')+'<button onclick="typingRevealDict()">'+(typingShowDictHint?'隱藏注音提示':'顯示注音提示')+'</button></div>'+
+   '<p>第 '+(typingLineIndex+1)+'／'+lesson.lines.length+' 句。可先聽前半句並打字，再聽後半句；也可以重播整句。聽完不會自動顯示漢字。</p>'+
+   '<div class="toolbar">'+voice(halves[0],'🔊 前半句')+voice(halves[1],'🔊 後半句')+voice(line.t,'🔊 整句')+'<button onclick="typingRevealDict()">'+(typingShowDictHint?'隱藏注音提示':'顯示注音提示')+'</button></div>'+
    (typingShowDictHint?'<div class="zh-passage">'+typingAnnotated(line,false)+'</div>':'<div class="zh-status">請按「播放這一句」，聽完再輸入。</div>')+
    '<label for="typingDictInput">聽到的句子</label>'+
    '<textarea id="typingDictInput" class="zh-input" rows="3" autocomplete="off" spellcheck="false" oninput="typingInput(\'dict-'+typingLineIndex+'\',this.value)">'+esc(typingValue('dict-'+typingLineIndex))+'</textarea>'+
