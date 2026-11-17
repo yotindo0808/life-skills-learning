@@ -28,6 +28,11 @@ label{display:block;font-weight:700;margin-bottom:8px}
 .feedback{border-radius:11px;padding:11px 12px;margin-top:11px;background:#f4f8f7;font-size:16px}
 .feedback.good{background:#e2f4e7;color:#205b34}
 .feedback.warn{background:#fff2d7;color:#7b531d}
+.guided-answers{display:grid;gap:9px;margin:12px 0}
+.guided-step{padding:11px 12px;background:#f5faf8;border:1px solid #d5e5e0;border-radius:10px;font-size:17px}
+.guided-step label{margin-bottom:4px}
+.guided-step input{width:100%;border:2px solid #b4ceca;background:white;color:var(--ink);border-radius:9px;padding:9px 11px;margin-top:7px;min-height:44px}
+.guided-step input:focus-visible{outline:3px solid #dc9e3b;outline-offset:2px}
 .prompt{background:#fff;border:1px solid var(--line);padding:11px 12px;border-radius:11px}
 progress{width:100%;height:11px;accent-color:var(--teal)}
 audio{max-width:100%;width:100%;margin:6px 0}
@@ -54,12 +59,133 @@ const STORY=[
  {title:"確認資訊，也能繼續分享",text:"兩人重新看過通知，確認了新的報到時間與活動地點。阿哲又問：「你剛才說的日本街景照片，是這次攝影課會介紹的內容嗎？」大吉發現，活動通知沒有寫到這件事。這是他自己另外想分享的話題。他需要把通知中已確認的資訊，和自己感興趣但尚未確認的內容分開說清楚。"}
 ];
 const QUESTIONS=[
- {id:"Q1",title:"哪些重要資訊改變了？",prompt:"比較舊公告和新通知，哪一項說明最完整？",scene:1,choices:["開始時間、報到時間、教室都更改，活動內容及攜帶物品不變。","只有教室換到一樓，報到與開始時間維持原樣。","活動內容與要帶的物品改了，時間和地點沒有改。"],answer:0,help:"比對兩份通知的開始時間、報到時間、活動地點，並注意哪些事情沒有改變。",check:"可以清楚說出：14:30 開始、14:15 前報到、一樓多功能教室；活動內容與物品沒變。"},
- {id:"Q2",title:"阿哲為什麼還不知道？",prompt:"阿哲已經知道有這場攝影活動，為什麼還是反覆問時間？",scene:3,choices:["他想知道攝影活動會不會介紹日本照片。","大吉說了更換原因，卻沒有先完整說出新報到時間。","阿哲並不知道自己報名了哪一場活動。"],answer:1,help:"想想阿哲在對話中缺少哪一個當下最需要的資訊。",check:"說明阿哲手上是舊公告，而且大吉一度沒有交代新的報到時間。"},
- {id:"Q3",title:"如何接續對方正在談的內容？",prompt:"阿哲說：「我現在比較想知道明天幾點要到圖書館。」大吉可以如何接續？",scene:3,choices:["「我最喜歡的妖怪影片裡有很多日本街景。」","「你不用擔心，我們到時候再說。」","「好，我先確認新通知：要在下午兩點十五分前報到。」"],answer:2,help:"先回答對方正在詢問的資訊，再考慮是否分享另一個話題。",check:"回應阿哲想知道的報到時間，若需要再補充活動地點。"},
- {id:"Q4",title:"告訴家人最重要的資訊",prompt:"如果要向家人說明星期四活動的變動，哪些內容是優先要說的？",scene:1,choices:["新的報到時間、開始時間、教室位置，以及變動的原因。","老師以前拍過哪些照片，以及大吉喜歡哪部妖怪影片。","只說有一場攝影活動，不用補充任何改變。"],answer:0,help:"想想家人需要知道什麼，才能準時送大吉到正確教室。",check:"先交代時間與地點，必要時補充變動原因，不必把所有細節都放進去。"},
- {id:"Q5",title:"用自己的話重述整件事",prompt:"請將事件告訴一位沒有看過故事的人：發生了什麼事？阿哲為什麼需要新資訊？最後怎麼確認？",scene:2,choices:["大吉聊了日本的街景，阿哲覺得很有趣。這就是整件事情。","攝影活動的時間和地點換了。阿哲只看過舊公告，大吉一開始沒有說清楚；兩人後來查看新通知，確認報到時間和教室。","阿哲不想參加攝影活動，所以大吉決定把活動取消。"],answer:1,help:"依照「事情起因 → 雙方知道的資訊 → 對話經過 → 最後結果」說清楚。",check:"建議包含：通知更改、阿哲持有舊資訊、大吉一度沒有說清楚、兩人最後確認新資訊。"},
- {id:"Q6",title:"區分已知資訊與想分享的話題",prompt:"阿哲問：「這次攝影課真的會介紹日本街景嗎？」大吉如何回答，才能清楚又能延續對話？",scene:4,choices:["「通知沒有寫這部分，我還不能確定。剛才是我另外想分享的照片。你對日本街景有興趣嗎？」","「我以前看過很多妖怪電影，裡面都有街景，你一定要聽。」","「一定有，因為那位講師以前有拍過日本照片。」"],answer:0,help:"把通知明確寫出的內容，與自己感興趣但未經確認的事情分開說。",check:"能表示「通知沒寫、目前不確定」，並視對方的回應決定是否繼續分享。"}
+  {
+    "id": "Q1",
+    "title": "哪些重要資訊改變了？",
+    "prompt": "比較舊公告和新通知，哪一項說明最完整？",
+    "scene": 1,
+    "choices": [
+      "開始時間、報到時間、教室都更改，活動內容及攜帶物品不變。",
+      "只有教室換到一樓，報到與開始時間維持原樣。",
+      "活動內容與要帶的物品改了，時間和地點沒有改。"
+    ],
+    "answer": 0,
+    "help": "比對兩份通知的開始時間、報到時間、活動地點，並注意哪些事情沒有改變。",
+    "check": "可以清楚說出：14:30 開始、14:15 前報到、一樓多功能教室；活動內容與物品沒變。"
+  },
+  {
+    "id": "Q2",
+    "title": "阿哲為什麼還不知道？",
+    "prompt": "阿哲已經知道有這場攝影活動，為什麼還是反覆問時間？",
+    "scene": 3,
+    "choices": [
+      "他想知道攝影活動會不會介紹日本照片。",
+      "大吉說了更換原因，卻沒有先完整說出新報到時間。",
+      "阿哲並不知道自己報名了哪一場活動。"
+    ],
+    "answer": 1,
+    "help": "想想阿哲在對話中缺少哪一個當下最需要的資訊。",
+    "check": "說明阿哲手上是舊公告，而且大吉一度沒有交代新的報到時間。"
+  },
+  {
+    "id": "Q3",
+    "title": "如何接續對方正在談的內容？",
+    "prompt": "阿哲說：「我現在比較想知道明天幾點要到圖書館。」大吉可以如何接續？",
+    "scene": 3,
+    "choices": [
+      "「我最喜歡的妖怪影片裡有很多日本街景。」",
+      "「你不用擔心，我們到時候再說。」",
+      "「好，我先確認新通知：要在下午兩點十五分前報到。」"
+    ],
+    "answer": 2,
+    "help": "先回答對方正在詢問的資訊，再考慮是否分享另一個話題。",
+    "check": "回應阿哲想知道的報到時間，若需要再補充活動地點。"
+  },
+  {
+    "id": "Q4",
+    "title": "告訴家人最重要的資訊",
+    "prompt": "如果要向家人說明星期四活動的變動，哪些內容是優先要說的？",
+    "scene": 1,
+    "choices": [
+      "新的報到時間、開始時間、教室位置，以及變動的原因。",
+      "老師以前拍過哪些照片，以及大吉喜歡哪部妖怪影片。",
+      "只說有一場攝影活動，不用補充任何改變。"
+    ],
+    "answer": 0,
+    "help": "想想家人需要知道什麼，才能準時送大吉到正確教室。",
+    "check": "先交代時間與地點，必要時補充變動原因，不必把所有細節都放進去。"
+  },
+  {
+    "id": "Q5",
+    "title": "依照四個提示整理事件",
+    "prompt": "不要一次說完整篇故事。先找出四個關鍵資訊，再把四句話依序說出來。",
+    "scene": 2,
+    "choices": [
+      "先聊日本照片，阿哲沒有參加活動，最後取消課程。",
+      "先收到新通知，阿哲只看過舊公告，大吉一度沒有說清楚，最後一起核對新通知。",
+      "阿哲先收到新通知，活動沒有變更，兩人不用再確認。"
+    ],
+    "answer": 1,
+    "help": "依照「通知改變 → 阿哲的資訊 → 大吉先分享的內容 → 最後核對」四個步驟整理。",
+    "check": "檢查四句是否分別提到：①開始時間與地點等改動；②舊公告；③日本街景照片或妖怪影片；④新通知。",
+    "scenes": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "stems": [
+      {
+        "before": "① 通知改了活動的",
+        "after": "。",
+        "hint": "找出時間、地點等改動。"
+      },
+      {
+        "before": "② 阿哲只看過",
+        "after": "，所以不知道新的安排。",
+        "hint": "他拿的是哪一份公告？"
+      },
+      {
+        "before": "③ 大吉先分享",
+        "after": "，沒有立即說明新報到時間。",
+        "hint": "大吉先聊起了什麼？"
+      },
+      {
+        "before": "④ 最後兩人一起查看",
+        "after": "，確認時間與教室。",
+        "hint": "最後他們一起查看什麼？"
+      }
+    ]
+  },
+  {
+    "id": "Q6",
+    "title": "分兩步回應並接續話題",
+    "prompt": "阿哲問：「這次攝影課真的會介紹日本街景嗎？」先判斷通知有沒有提到，再完成回應。",
+    "scene": 4,
+    "choices": [
+      "「通知沒有寫這部分，我還不能確定。剛才是我另外想分享的照片。你對日本街景有興趣嗎？」",
+      "「我以前看過很多妖怪電影，裡面都有街景，你一定要聽。」",
+      "「一定有，因為那位講師以前有拍過日本照片。」"
+    ],
+    "answer": 0,
+    "help": "第一步說明通知是否有寫；第二步說明自己想分享什麼，再問對方是否感興趣。",
+    "check": "先回答「通知沒有寫」，再說明「我剛才想分享日本街景照片」，最後可詢問對方的興趣。",
+    "scenes": [
+      4
+    ],
+    "stems": [
+      {
+        "before": "① 新通知",
+        "after": "這件事。",
+        "hint": "有寫／沒有寫？"
+      },
+      {
+        "before": "② 我剛才想分享的是",
+        "after": "。你有興趣聽嗎？",
+        "hint": "他原先想分享什麼？"
+      }
+    ]
+  }
 ];
 const KEY="life-da-ji-story-v1";
 let state={page:"read",scene:0,question:0,mode:"choice",answers:{},revealed:{},readCompleted:false};
@@ -95,27 +221,94 @@ function renderReading(left,right){
  left.innerHTML='<div class="context-title">虛構故事｜第 '+(state.scene+1)+' 段</div><h2>'+e(s.title)+'</h2><p>'+e(s.text)+'</p><div class="toolbar"><button onclick="sayStory('+state.scene+')">🔊 報讀本段</button><button onclick="sayAll()">🔊 報讀全文</button><button onclick="stopSpeak()">停止報讀</button></div>';
  right.innerHTML='<h2>先理解故事內容</h2><p>請讀完這一段，再想一想：這段話提供了哪些新資訊？你會怎麼向別人說明？</p><div class="prompt"><strong>閱讀提示：</strong><div>'+e(["原本活動怎麼安排？","哪些資訊更改？哪些沒有？","阿哲掌握的是哪份資訊？","阿哲目前真正想知道什麼？","怎麼區分通知內容和個人興趣？"][state.scene])+'</div></div><div class="toolbar"><button onclick="changeScene(-1)" '+(state.scene===0?"disabled":"")+'>上一段</button><button class="primary" onclick="nextScene()">'+(state.scene===4?"開始回答問題":"下一段")+'</button></div><p class="muted">不用追求閱讀速度。回答時可選擇點選、口說或打字，也能重新查看故事。</p>';
 }
+function renderScaffoldInputs(q,a){
+ const parts=Array.isArray(a.scaffoldParts)?a.scaffoldParts:[];
+ return '<p class="small">一格只需要填入一項關鍵資訊。可以回看故事，不必一次寫出長篇文章。</p>'+
+ '<div class="guided-answers">'+q.stems.map((step,i)=>
+ '<div class="guided-step"><label for="scaffoldPart'+i+'">'+e(step.before)+' ______ '+e(step.after)+'</label>'+
+ '<div class="small muted">'+e(step.hint)+'</div>'+
+ '<input type="text" id="scaffoldPart'+i+'" autocomplete="off" spellcheck="false" placeholder="填入關鍵詞或短句" value="'+e(parts[i]||"")+'" oninput="scaffoldChange('+i+',this.value)"/>'+
+ '</div>').join("")+'</div>';
+}
+function renderScaffoldSpeech(q){
+ return '<div class="guided-answers"><strong>依提示逐句說，不必一次說整篇</strong>'+
+ q.stems.map((step,i)=>'<div class="guided-step"><div>' +e(step.before)+' ______ '+e(step.after)+'</div>'+
+ '<div class="small muted">'+e(step.hint)+'</div></div>').join("")+
+ '</div><p class="small muted">可以一個步驟說完，再說下一個；口說練習不要求背下完整故事。</p>';
+}
 function renderQuestions(left,right){
- const q=QUESTIONS[state.question],a=answerFor(q.id),seen=!!state.revealed[q.id];
- left.innerHTML='<div class="context-title">故事回顧｜'+e(q.title)+'</div><h2>先回想剛才讀到什麼</h2><p>可以先不看故事，嘗試回答右側問題。需要時再查看原文。</p><div class="toolbar"><button onclick="reveal()">📖 查看相關故事段落</button><button onclick="speak(STORY['+q.scene+'].text)">🔊 報讀相關段落</button></div>'+(seen?'<div class="prompt"><strong>'+e(STORY[q.scene].title)+'</strong><p>'+e(STORY[q.scene].text)+'</p></div>':'<div class="feedback">目前沒有顯示原文。若忘記內容，可使用上方提示。</div>')+'<p class="small muted">查看故事不代表答錯，系統只記錄使用提示的次數。</p>';
- let html='<h2>第 '+(state.question+1)+' 題｜'+e(q.title)+'</h2><div class="prompt"><strong>'+e(q.prompt)+'</strong><div class="toolbar"><button onclick="speak(QUESTIONS['+state.question+'].prompt)">🔊 報讀題目</button><button onclick="stopSpeak()">停止報讀</button></div></div><div class="answer-modes" aria-label="選擇作答方式"><button aria-pressed="'+(state.mode==="choice")+'" onclick="setMode(\'choice\')">選擇題</button><button aria-pressed="'+(state.mode==="speech")+'" onclick="setMode(\'speech\')">口說回答</button><button aria-pressed="'+(state.mode==="typing")+'" onclick="setMode(\'typing\')">打字回答</button></div>';
- if(state.mode==="choice"){html+=q.choices.map((v,i)=>'<div class="option"><button class="choose" onclick="pick('+i+')">'+(i+1)+'．'+e(v)+'</button><button class="readopt" aria-label="報讀選項 '+(i+1)+'" onclick="speak(QUESTIONS['+state.question+'].choices['+i+'])">🔊</button></div>').join("");
- if(a.choiceCorrect)html+='<div class="feedback good">這題已選到符合故事的答案。'+e(q.help)+'</div>';
- else if(a.choiceTried)html+='<div class="feedback warn">這個選項與故事內容不完全相符。請重新讀題或查看相關段落。</div>';
+ const q=QUESTIONS[state.question],a=answerFor(q.id),seen=!!state.revealed[q.id],related=(Array.isArray(q.scenes)?q.scenes:[q.scene]).map(i=>STORY[i]);
+ left.innerHTML='<div class="context-title">故事回顧｜'+e(q.title)+'</div><h2>先回想剛才讀到什麼</h2>'+
+ '<p>可以先不看故事，嘗試回答右側問題。需要時再查看原文。</p>'+
+ '<div class="toolbar"><button onclick="reveal()">📖 查看相關故事段落</button>'+
+ '<button onclick="speak((Array.isArray(QUESTIONS['+state.question+'].scenes)?QUESTIONS['+state.question+'].scenes:[QUESTIONS['+state.question+'].scene]).map(i=>STORY[i].text).join(\'。\'))">🔊 報讀相關段落</button></div>'+
+ (seen?related.map(x=>'<div class="prompt"><strong>'+e(x.title)+'</strong><p>'+e(x.text)+'</p></div>').join(""):'<div class="feedback">目前沒有顯示原文。若忘記內容，可使用上方提示。</div>')+
+ '<p class="small muted">查看故事不代表答錯，系統只記錄使用提示的次數。</p>';
+ let html='<h2>第 '+(state.question+1)+' 題｜'+e(q.title)+'</h2><div class="prompt"><strong>'+e(q.prompt)+'</strong>'+
+ '<div class="toolbar"><button onclick="speak(QUESTIONS['+state.question+'].prompt)">🔊 報讀題目</button><button onclick="stopSpeak()">停止報讀</button></div></div>'+
+ '<div class="answer-modes" aria-label="選擇作答方式">'+
+ '<button aria-pressed="'+(state.mode==="choice")+'" onclick="setMode(\'choice\')">選擇題</button>'+
+ '<button aria-pressed="'+(state.mode==="speech")+'" onclick="setMode(\'speech\')">口說回答</button>'+
+ '<button aria-pressed="'+(state.mode==="typing")+'" onclick="setMode(\'typing\')">打字回答</button></div>';
+ if(state.mode==="choice"){
+  html+=q.choices.map((v,i)=>'<div class="option"><button class="choose" onclick="pick('+i+')">'+(i+1)+'．'+e(v)+'</button>'+
+  '<button class="readopt" aria-label="報讀選項 '+(i+1)+'" onclick="speak(QUESTIONS['+state.question+'].choices['+i+'])">🔊</button></div>').join("");
+  if(a.choiceCorrect)html+='<div class="feedback good">這題已選到符合故事的答案。'+e(q.help)+'</div>';
+  else if(a.choiceTried)html+='<div class="feedback warn">這個選項與故事內容不完全相符。請重新讀題或查看相關段落。</div>';
  }
- if(state.mode==="typing"){html+='<label for="typedAnswer">用自己的話回答</label><textarea id="typedAnswer" autocomplete="off" placeholder="請自行說明，不需要照抄故事" oninput="typeChange(this.value)">'+e(a.typed||"")+'</textarea><div class="toolbar"><button class="primary" onclick="submitTyped()">儲存這次打字回答</button><button onclick="speak(QUESTIONS['+state.question+'].check)">🔊 聽檢查提示</button></div>';
- if(a.typingSubmitted)html+='<div class="feedback good">文字已儲存，尚未由教師評閱。請自行檢查：'+e(q.check)+'</div>';
+ if(state.mode==="typing"){
+  if(q.stems){
+   html+='<label>依照提示填入關鍵資訊</label>'+renderScaffoldInputs(q,a);
+   if(a.typed&&!Array.isArray(a.scaffoldParts))html+='<div class="feedback">先前儲存的回答：'+e(a.typed)+'</div>';
+  }else{
+   html+='<label for="typedAnswer">回答上面的問題</label>'+
+   '<textarea id="typedAnswer" autocomplete="off" placeholder="找出相關資訊，輸入一至兩句回答" oninput="typeChange(this.value)">'+e(a.typed||"")+'</textarea>';
+  }
+  html+='<div class="toolbar"><button class="primary" onclick="submitTyped()">儲存這次打字回答</button>'+
+  '<button onclick="speak(QUESTIONS['+state.question+'].check)">🔊 聽檢查提示</button></div>';
+  if(a.typingSubmitted)html+='<div class="feedback good">文字已儲存，尚未由教師評閱。請自行檢查：'+e(q.check)+'</div>';
  }
- if(state.mode==="speech"){html+='<p class="small">先用自己的話說明。可錄音並回聽；如果此瀏覽器支援，也可以嘗試語音轉文字。</p><div class="toolbar"><button id="recordButton" class="primary" onclick="toggleRecord()">🎙️ 開始錄音</button><button id="recognizeButton" onclick="startRecognize()" '+(!recognitionSupported()?"disabled":"")+'>🎤 語音轉文字</button></div><div id="recordStatus" class="feedback" role="status">錄音需允許麥克風權限。語音轉文字不一定支援 iPad 瀏覽器。</div><div id="audioResult" data-id="'+q.id+'"></div><label for="speechText">口說內容的文字紀錄（選填）</label><textarea id="speechText" placeholder="語音辨識結果或使用鍵盤上的麥克風輸入" oninput="speechTextChange(this.value)">'+e(a.spokenText||"")+'</textarea><div class="toolbar"><button class="primary" onclick="submitSpeech()">確認已完成口說練習</button><button onclick="speak(QUESTIONS['+state.question+'].check)">🔊 聽檢查提示</button></div>';
- if(a.speechSubmitted)html+='<div class="feedback good">已記錄口說練習完成；錄音及語音辨識不等於口語能力評分。請自行檢查：'+e(q.check)+'</div>';
+ if(state.mode==="speech"){
+  if(q.stems)html+=renderScaffoldSpeech(q);
+  else html+='<p class="small">先回答上面的問題，可用一至兩句話。錄音後可回聽。</p>';
+  html+='<div class="toolbar"><button id="recordButton" class="primary" onclick="toggleRecord()">🎙️ 開始錄音</button>'+
+  '<button id="recognizeButton" onclick="startRecognize()" '+(!recognitionSupported()?"disabled":"")+'>🎤 語音轉文字</button></div>'+
+  '<div id="recordStatus" class="feedback" role="status">錄音需允許麥克風權限。語音轉文字不一定支援 iPad 瀏覽器。</div>'+
+  '<div id="audioResult" data-id="'+q.id+'"></div><label for="speechText">口說內容的文字紀錄（選填）</label>'+
+  '<textarea id="speechText" placeholder="語音辨識結果或使用鍵盤上的麥克風輸入" oninput="speechTextChange(this.value)">'+e(a.spokenText||"")+'</textarea>'+
+  '<div class="toolbar"><button class="primary" onclick="submitSpeech()">確認已完成口說練習</button>'+
+  '<button onclick="speak(QUESTIONS['+state.question+'].check)">🔊 聽檢查提示</button></div>';
+  if(a.speechSubmitted)html+='<div class="feedback good">已記錄口說練習完成；錄音及語音辨識不等於口語能力評分。請自行檢查：'+e(q.check)+'</div>';
  }
- html+='<div class="footer"><button onclick="changeQ(-1)" '+(state.question===0?"disabled":"")+'>上一題</button><button class="primary" onclick="'+(state.question===5?"showSummary()":"changeQ(1)")+'">'+(state.question===5?"查看紀錄":"下一題")+'</button></div>';
+ html+='<div class="footer"><button onclick="changeQ(-1)" '+(state.question===0?"disabled":"")+'>上一題</button>'+
+ '<button class="primary" onclick="'+(state.question===5?"showSummary()":"changeQ(1)")+'">'+(state.question===5?"查看紀錄":"下一題")+'</button></div>';
  right.innerHTML=html;
  if(state.mode==="speech")loadAudio(q.id);
 }
+
 function pick(i){const q=QUESTIONS[state.question],a=answerFor(q.id);a.choiceAttempts=(a.choiceAttempts||0)+1;a.choiceTried=true;if(i===q.answer)a.choiceCorrect=true;save();render()}
 function typeChange(v){const q=QUESTIONS[state.question],a=answerFor(q.id);a.typed=String(v).slice(0,1200);a.typingSubmitted=false;save()}
-function submitTyped(){const q=QUESTIONS[state.question],a=answerFor(q.id);const v=document.getElementById("typedAnswer").value.trim();if(v.length<6){alert("請先用自己的話輸入較完整的回答。");return}a.typed=v;a.typingSubmitted=true;save();render()}
+function scaffoldChange(i,v){
+ const q=QUESTIONS[state.question],a=answerFor(q.id);
+ if(!Array.isArray(q.stems)||!q.stems[i])return;
+ if(!Array.isArray(a.scaffoldParts))a.scaffoldParts=q.stems.map(()=>"");
+ a.scaffoldParts[i]=String(v).slice(0,150);
+ a.typingSubmitted=false;
+ save();
+}
+function submitTyped(){
+ const q=QUESTIONS[state.question],a=answerFor(q.id);
+ if(Array.isArray(q.stems)){
+  const parts=q.stems.map((_,i)=>(document.getElementById("scaffoldPart"+i)?.value||"").trim());
+  if(parts.some(v=>v.length===0)){alert("請先依照提示完成每一個空格。每格填一項關鍵資訊即可。");return}
+  a.scaffoldParts=parts;
+  a.typed=q.stems.map((step,i)=>step.before+parts[i]+step.after).join("\n");
+  a.typingSubmitted=true;save();render();return;
+ }
+ const v=document.getElementById("typedAnswer").value.trim();
+ if(v.length<2){alert("請先回答上面的問題。");return}
+ a.typed=v;a.typingSubmitted=true;save();render();
+}
 function speechTextChange(v){const q=QUESTIONS[state.question],a=answerFor(q.id);a.spokenText=String(v).slice(0,1200);save()}
 function submitSpeech(){const q=QUESTIONS[state.question],a=answerFor(q.id);if(!a.hasAudio&&!(a.spokenText||"").trim()){alert("請先錄下口說，或使用語音輸入文字。");return}a.speechSubmitted=true;save();render()}
 function renderSummary(left,right){
