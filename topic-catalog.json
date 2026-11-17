@@ -75,14 +75,19 @@
     },
     {
       "id": "typing",
-      "title": "數位打字與訊息表達",
-      "description": "使用 iPad 與外接鍵盤練習輸入文字，並將輸入內容用於生活事件說明。",
+      "title": "數位打字、注音與訊息表達",
+      "description": "閱讀帶注音的完整短文，練習注音輸入、逐句聽打與聲調辨認，並延續生活事件的文字表達。",
       "enabled": true,
       "items": [
         {
+          "type": "typing-passages",
+          "title": "注音短文打字與聽打",
+          "description": "三篇不同的短文，每篇四句。先讀全文，再只看注音打字、聽一句打字，最後練習一至四聲與輕聲。"
+        },
+        {
           "type": "legacy-sections",
-          "title": "活動資訊打字練習",
-          "description": "原有活動名稱、地點、時間等文字輸入任務。",
+          "title": "活動情境中的短文練習",
+          "description": "從既有活動情境直接進入注音短文；同一篇短文沿用相同練習紀錄。",
           "sections": [
             "F"
           ]
