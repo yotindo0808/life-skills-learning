@@ -106,6 +106,7 @@ let typingLoadError=false;
 let typingMode='read';
 let typingLineIndex=0;
 let typingToneIndex=0;
+let typingToneReveal=false;
 let typingShowCharacters=false;
 let typingShowDictHint=false;
 let typingStatus={message:'',type:''};
@@ -116,7 +117,7 @@ async function loadTypingPassages(){
   const response=await fetch(u+'?v='+Date.now(),{cache:'no-store'});
   if(!response.ok)throw Error('HTTP '+response.status);
   const data=await response.json();
-  if(data.schema!=='daji-zhuyin-typing-v2'||!Array.isArray(data.passages)||data.passages.length===0)throw Error('短文資料格式錯誤');
+  if(data.schema!=='daji-zhuyin-typing-v3'||!Array.isArray(data.passages)||data.passages.length===0)throw Error('短文資料格式錯誤');
   for(const p of data.passages){
    if(!p||!Array.isArray(p.lines)||!Array.isArray(p.tones))throw Error('短文段落不完整');
    for(const line of p.lines){
@@ -145,7 +146,9 @@ function typingProgressKey(w=view.week,d=view.day){
 function typingProgress(){
  const key=typingProgressKey();
  const old=state.progress[key];
- if(!old||typeof old!=='object')state.progress[key]={copyDone:false,dictDone:[],toneDone:[],hintCount:0,done:false};
+ if(!old||typeof old!=='object')state.progress[key]={copyDone:false,dictDone:[],toneDone:[],toneFirstAttempt:[],toneAttempts:[],hintCount:0,done:false};
+ if(!Array.isArray(state.progress[key].toneFirstAttempt))state.progress[key].toneFirstAttempt=[];
+ if(!Array.isArray(state.progress[key].toneAttempts))state.progress[key].toneAttempts=[];
  return state.progress[key];
 }
 function typingSaveProgress(){
@@ -158,12 +161,12 @@ function openTypingPassage(id){
  if(!typingPassages.some(p=>p.id===id)){alert('這篇短文目前無法開啟。');return}
  stopVoice();
  view={mode:'typing',typingId:id,week:1,day:1,section:'F',index:0};
- typingMode='read';typingLineIndex=0;typingToneIndex=0;typingShowCharacters=false;typingShowDictHint=false;typingStatus={message:'',type:''};
+ typingMode='read';typingLineIndex=0;typingToneIndex=0;typingToneReveal=false;typingShowCharacters=false;typingShowDictHint=false;typingStatus={message:'',type:''};
  render();
 }
 function showTypingMode(mode){
  if(!['read','copy','dict','tone'].includes(mode))return;
- stopVoice();typingMode=mode;typingStatus={message:'',type:''};render();
+ stopVoice();typingMode=mode;typingToneReveal=false;typingStatus={message:'',type:''};render();
 }
 function typingAnnotated(line,showHanzi=true){
  const syll=line.z.trim().split(/\s+/);
@@ -240,14 +243,25 @@ function typingToneSyllable(lesson,tone){
 }
 function typingSelectTone(value){
  const lesson=typingLesson(),tone=lesson.tones[typingToneIndex];
+ const p=typingProgress(),k=typingToneIndex;
+ p.toneAttempts[k]=(p.toneAttempts[k]||0)+1;
+ if(p.toneFirstAttempt[k]===undefined)p.toneFirstAttempt[k]=(value===tone.tone);
+ typingToneReveal=true;
  if(value===tone.tone){
-  typingProgress().toneDone[typingToneIndex]=true;typingSaveProgress();
-  typingStatus={message:'這個字的聲調判斷正確。可以繼續下一題。',type:'good'};render();
- }else typingSetStatus('再看一次注音的聲調符號，必要時按「報讀詞語」再聽。');
+  p.toneDone[k]=true;
+  typingStatus={message:'依教材標示的聲調，這題選對了。請再聽一次確認讀音。',type:'good'};
+ }else{
+  typingStatus={message:'這次選的聲調和教材標示不同。可以看注音核對，再聽一次。',type:'warn'};
+ }
+ typingSaveProgress();render();
 }
 function typingToneNext(amount){
  typingToneIndex=Math.max(0,Math.min(typingLesson().tones.length-1,typingToneIndex+amount));
- typingStatus={message:'',type:''};render();
+ typingToneReveal=false;typingStatus={message:'',type:''};render();
+}
+function typingToneListen(){
+ const t=typingLesson().tones[typingToneIndex];
+ speak(t.audioText);
 }
 function typingFeedback(){
  return '<div id="typingFeedback" class="zh-status '+esc(typingStatus.type||'')+'" role="status">'+
@@ -294,16 +308,21 @@ function renderAnnotatedTyping(){
    '<span class="zh-small">已核對 '+p.dictDone.filter(Boolean).length+'／'+lesson.lines.length+' 句</span>'+
    '<button onclick="typingDictNext(1)" '+(typingLineIndex===lesson.lines.length-1?'disabled':'')+'>下一句</button></div>';
  }else if(typingMode==='tone'){
-  const tone=lesson.tones[typingToneIndex],syll=typingToneSyllable(lesson,tone);
-  h+='<h2>辨認注音的聲調</h2>'+
-   '<p>第 '+(typingToneIndex+1)+'／'+lesson.tones.length+' 題。看注音的聲調符號，也可以聽詞語。這裡練習辨認標記，不以合成語音判定聽力。</p>'+
-   '<div class="zh-tone"><ruby>'+esc(tone.char)+'<rt>'+esc(syll)+'</rt></ruby></div>'+
-   '<p class="zh-small">故事中的詞語：'+esc(tone.word)+'</p>'+
-   '<div class="toolbar">'+voice(tone.word.includes('第二個字')?'媽媽':tone.word,'🔊 報讀詞語')+'</div>'+
+  const tone=lesson.tones[typingToneIndex];
+  const showAnswer=typingToneReveal||!!p.toneDone[typingToneIndex];
+  const syll=showAnswer?typingToneSyllable(lesson,tone):'';
+  const order=tone.targetIndex+1;
+  h+='<h2>聽讀音，選出正確聲調</h2>'+
+   '<p>第 '+(typingToneIndex+1)+'／'+lesson.tones.length+' 題。<strong>先聽詞語，再判斷第 '+order+' 個字的聲調。</strong>答題前不顯示漢字與注音。</p>'+
+   '<div class="zh-tone"><span style="font-size:23px">🎧 先聽，不看注音</span></div>'+
+   '<div class="toolbar"><button class="primary" onclick="typingToneListen()">🔊 播放詞語</button><button onclick="typingToneListen()">🔁 再聽一次</button></div>'+
+   '<p class="zh-small">請辨認剛才詞語的第 '+order+' 個字，並選擇它的聲調。</p>'+
    '<div class="zh-tone-options">'+TONE_OPTIONS.map(opt=>'<button onclick="typingSelectTone('+opt.n+')">'+esc(opt.label)+'</button>').join('')+'</div>'+
+   (showAnswer?'<div class="zh-status"><strong>作答後核對：</strong> '+esc(tone.audioText)+'，第 '+order+' 個字「'+esc(tone.char)+'」的注音：<strong>'+esc(syll||'請參照課文')+'</strong>。<div class="toolbar"><button onclick="typingToneListen()">🔊 再聽詞語</button></div></div>':'')+
    '<div class="zh-dict-nav"><button onclick="typingToneNext(-1)" '+(typingToneIndex===0?'disabled':'')+'>上一題</button>'+
-   '<span class="zh-small">已答對 '+p.toneDone.filter(Boolean).length+'／'+lesson.tones.length+' 題</span>'+
+   '<span class="zh-small">選對 '+p.toneDone.filter(Boolean).length+'／'+lesson.tones.length+' 題；首次選對 '+p.toneFirstAttempt.filter(v=>v===true).length+' 題</span>'+
    '<button onclick="typingToneNext(1)" '+(typingToneIndex===lesson.tones.length-1?'disabled':'')+'>下一題</button></div>';
+
  }
  h+=typingFeedback()+
   (p.done?'<div class="zh-status good"><strong>三個打字練習已完成。</strong>下次可以改練另一篇短文。</div>':'')+
@@ -391,7 +410,7 @@ function start(w,d,s='A'){
  if(!canStart(w,d)){alert('這一天尚未開放');return}
  stopVoice();if(speechEngine){try{speechEngine.abort()}catch(e){}speechEngine=null}
  speechStatus='';speechTranscript='';mathReady=false;mathStage='method';mathFirstMethodCorrect=true;mathFirstNumberCorrect=true;mathInput='';
- if(s==='F'){typingMode='read';typingLineIndex=0;typingToneIndex=0;typingShowCharacters=false;typingShowDictHint=false;typingStatus={message:'',type:''}}
+ if(s==='F'){typingMode='read';typingLineIndex=0;typingToneIndex=0;typingToneReveal=false;typingShowCharacters=false;typingShowDictHint=false;typingStatus={message:'',type:''}}
  // 已開放日期的 A–F 均可由學生直接選擇；保留建議順序，不再用前一區完成狀態封鎖。
  view={mode:'practice',week:w,day:d,section:s,index:0};render();
 }
