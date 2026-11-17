@@ -1,0 +1,69 @@
+name: 教師開放主題課程
+
+on:
+  workflow_dispatch:
+    inputs:
+      topic_id:
+        description: "要調整的主題"
+        required: true
+        type: choice
+        options:
+          - activity
+          - shopping
+          - story
+          - typing
+      visibility:
+        description: "在學生首頁顯示這個主題嗎？"
+        required: true
+        type: choice
+        options:
+          - "顯示"
+          - "隱藏"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: topic-release
+  cancel-in-progress: false
+
+jobs:
+  update-topic:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the existing catalog
+        uses: actions/checkout@v4
+      - name: Change topic visibility
+        env:
+          TOPIC_ID: \${{ inputs.topic_id }}
+          VISIBILITY: \${{ inputs.visibility }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          topic_id = os.environ["TOPIC_ID"]
+          visibility = os.environ["VISIBILITY"]
+          if visibility not in ("顯示", "隱藏"):
+              raise ValueError("Invalid visibility")
+          path = Path("topic-catalog.json")
+          catalog = json.loads(path.read_text(encoding="utf-8"))
+          found = [topic for topic in catalog["topics"] if topic["id"] == topic_id]
+          if len(found) != 1:
+              raise ValueError("Topic ID not found or not unique: " + topic_id)
+          found[0]["enabled"] = visibility == "顯示"
+          path.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          print("Topic:", topic_id, "visible:", found[0]["enabled"])
+          PY
+      - name: Commit topic catalog update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add topic-catalog.json
+          if git diff --cached --quiet; then
+            echo "No change in topic visibility"
+          else
+            git commit -m "Teacher: update topic visibility"
+            git push
+          fi
