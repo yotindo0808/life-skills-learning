@@ -1,0 +1,99 @@
+{
+  "schema": "daji-topic-catalog-v1",
+  "note": "首頁依生活主題分類；原有題庫與作答紀錄維持不變，舊課程仍受 course-config.json 控制。",
+  "topics": [
+    {
+      "id": "activity",
+      "title": "活動中心與生活資訊",
+      "description": "看懂活動通知、辨認時間地點，從活動中心情境練習閱讀、聆聽、數學、對話和打字。",
+      "enabled": true,
+      "items": [
+        {
+          "type": "legacy-course",
+          "week": 1,
+          "title": "活動通知與參與準備",
+          "description": "原有活動中心情境，保留閱讀、數學、聆聽、對話及打字練習。"
+        },
+        {
+          "type": "legacy-course",
+          "week": 2,
+          "title": "活動資訊確認與應對",
+          "description": "同一生活領域的延伸情境，包含求助、資訊確認與應對。"
+        }
+      ]
+    },
+    {
+      "id": "shopping",
+      "title": "購物、收據與金錢運算",
+      "description": "從商品標價、收據到付款與找零，練習加減乘的情境判斷與金額理解。",
+      "enabled": true,
+      "items": [
+        {
+          "type": "page",
+          "title": "商品標價與購物合計",
+          "description": "讀標價、加減乘八題、說明購買內容。",
+          "href": "./lesson-2026-11-11/"
+        },
+        {
+          "type": "page",
+          "title": "超商收據與找零判讀",
+          "description": "閱讀收據、加減乘八題、向店員確認與重述。",
+          "href": "./lesson-2026-11-17/"
+        },
+        {
+          "type": "legacy-sections",
+          "title": "活動中心的數學延伸題",
+          "description": "原有購物與金錢題庫，可補充練習。",
+          "sections": [
+            "B"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "story",
+      "title": "故事理解、事件重述與對話",
+      "description": "閱讀較完整的故事，找出重要資訊，練習用自己的話重述及回應對話者。",
+      "enabled": true,
+      "items": [
+        {
+          "type": "page",
+          "title": "活動通知改變了",
+          "description": "五段故事，六道練習，可選擇題、口說、打字並使用報讀。",
+          "href": "./story-practice/"
+        },
+        {
+          "type": "legacy-sections",
+          "title": "活動情境中的對話與生活判斷",
+          "description": "原有情境對話及生活判斷題，作為延伸教材。",
+          "sections": [
+            "C",
+            "E"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "typing",
+      "title": "數位打字與訊息表達",
+      "description": "使用 iPad 與外接鍵盤練習輸入文字，並將輸入內容用於生活事件說明。",
+      "enabled": true,
+      "items": [
+        {
+          "type": "legacy-sections",
+          "title": "活動資訊打字練習",
+          "description": "原有活動名稱、地點、時間等文字輸入任務。",
+          "sections": [
+            "F"
+          ]
+        },
+        {
+          "type": "page",
+          "title": "故事內容打字與口說",
+          "description": "用自己的話重述，文字及錄音保存在本裝置。",
+          "href": "./story-practice/"
+        }
+      ]
+    }
+  ]
+}
