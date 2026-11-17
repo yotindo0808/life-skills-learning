@@ -261,6 +261,10 @@ function typingToneNext(amount){
 }
 function typingToneListen(){
  const t=typingLesson().tones[typingToneIndex];
+ speak(t.question);
+}
+function typingToneWord(){
+ const t=typingLesson().tones[typingToneIndex];
  speak(t.audioText);
 }
 function typingFeedback(){
@@ -313,12 +317,13 @@ function renderAnnotatedTyping(){
   const syll=showAnswer?typingToneSyllable(lesson,tone):'';
   const order=tone.targetIndex+1;
   h+='<h2>聽讀音，選出正確聲調</h2>'+
-   '<p>第 '+(typingToneIndex+1)+'／'+lesson.tones.length+' 題。<strong>先聽詞語，再判斷第 '+order+' 個字的聲調。</strong>答題前不顯示漢字與注音。</p>'+
-   '<div class="zh-tone"><span style="font-size:23px">🎧 先聽，不看注音</span></div>'+
-   '<div class="toolbar"><button class="primary" onclick="typingToneListen()">🔊 播放詞語</button><button onclick="typingToneListen()">🔁 再聽一次</button></div>'+
-   '<p class="zh-small">請辨認剛才詞語的第 '+order+' 個字，並選擇它的聲調。</p>'+
+   '<p>第 '+(typingToneIndex+1)+'／'+lesson.tones.length+' 題</p>'+
+   '<div class="zh-status"><strong>'+esc(tone.question)+'</strong></div>'+
+   '<p>先聽完整題目，再選出目標字的聲調。題目會顯示漢字，<strong>作答前不顯示注音答案</strong>。</p>'+
+   '<div class="toolbar"><button class="primary" onclick="typingToneListen()">🔊 報讀完整題目</button><button onclick="typingToneWord()">🔊 單聽詞語</button></div>'+
    '<div class="zh-tone-options">'+TONE_OPTIONS.map(opt=>'<button onclick="typingSelectTone('+opt.n+')">'+esc(opt.label)+'</button>').join('')+'</div>'+
-   (showAnswer?'<div class="zh-status"><strong>作答後核對：</strong> '+esc(tone.audioText)+'，第 '+order+' 個字「'+esc(tone.char)+'」的注音：<strong>'+esc(syll||'請參照課文')+'</strong>。<div class="toolbar"><button onclick="typingToneListen()">🔊 再聽詞語</button></div></div>':'')+
+   (showAnswer?'<div class="zh-status"><strong>作答後核對：</strong>'+esc(tone.audioText)+' 的「'+esc(tone.char)+'」注音是 <strong>'+esc(syll||'請參照課文')+'</strong>。'+
+      '<div class="toolbar"><button onclick="typingToneListen()">🔊 再聽完整題目</button></div></div>':'')+
    '<div class="zh-dict-nav"><button onclick="typingToneNext(-1)" '+(typingToneIndex===0?'disabled':'')+'>上一題</button>'+
    '<span class="zh-small">選對 '+p.toneDone.filter(Boolean).length+'／'+lesson.tones.length+' 題；首次選對 '+p.toneFirstAttempt.filter(v=>v===true).length+' 題</span>'+
    '<button onclick="typingToneNext(1)" '+(typingToneIndex===lesson.tones.length-1?'disabled':'')+'>下一題</button></div>';
