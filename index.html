@@ -130,12 +130,18 @@ async function loadTypingPassages(){
 }
 function typingLesson(){
  if(!typingPassages.length)return null;
+ if(view.mode==='typing')return typingPassages.find(p=>p.id===view.typingId)||null;
  return typingPassages[((view.week-1)*7+view.day-1)%typingPassages.length];
 }
 function typingStorageKey(suffix){
- return 'zhuyin-v2-W'+view.week+'D'+view.day+'-'+suffix;
+ const lesson=typingLesson();
+ return 'zhuyin-v2-'+(lesson?lesson.id:'unavailable')+'-'+suffix;
 }
-function typingProgressKey(w=view.week,d=view.day){return 'W'+w+'D'+d+'-F-ZHUYIN-V2'}
+function typingProgressKey(w=view.week,d=view.day){
+ if(!typingPassages.length)return 'W'+w+'D'+d+'-F-ZHUYIN-V2';
+ const selected=(view.mode==='typing'&&arguments.length===0)?typingLesson():typingPassages[((w-1)*7+d-1)%typingPassages.length];
+ return 'TYPING-ZHUYIN-V2-'+(selected?selected.id:'unavailable');
+}
 function typingProgress(){
  const key=typingProgressKey();
  const old=state.progress[key];
@@ -147,6 +153,13 @@ function typingSaveProgress(){
  p.done=!!p.copyDone&&lesson.lines.every((_,i)=>p.dictDone[i])&&lesson.tones.every((_,i)=>p.toneDone[i]);
  p.last=Date.now();
  save();
+}
+function openTypingPassage(id){
+ if(!typingPassages.some(p=>p.id===id)){alert('這篇短文目前無法開啟。');return}
+ stopVoice();
+ view={mode:'typing',typingId:id,week:1,day:1,section:'F',index:0};
+ typingMode='read';typingLineIndex=0;typingToneIndex=0;typingShowCharacters=false;typingShowDictHint=false;typingStatus={message:'',type:''};
+ render();
 }
 function showTypingMode(mode){
  if(!['read','copy','dict','tone'].includes(mode))return;
@@ -180,7 +193,7 @@ function typingCheckCopy(){
  typingInput('copy',value);
  if(!typingNormalize(value)){typingSetStatus('先輸入短文，再核對。');return}
  if(typingNormalize(value)===typingNormalize(typingPlain(lesson))){
-  typingProgress().copyDone=true;typingSaveProgress();typingSetStatus('短文內容核對完成。接下來可以試著只聽一句再打。','good');
+  typingProgress().copyDone=true;typingSaveProgress();typingStatus={message:'短文內容核對完成。接下來可以試著只聽一句再打。',type:'good'};render();
  }else typingSetStatus('文字還有差異。請看看注音或顯示漢字提示，再修改後核對。');
 }
 function typingDictNext(amount){
@@ -194,7 +207,7 @@ function typingCheckDict(){
  if(!typingNormalize(value)){typingSetStatus('請先聽完這一句，再輸入你記得的文字。');return}
  if(typingNormalize(value)===typingNormalize(line.t)){
   typingProgress().dictDone[typingLineIndex]=true;typingSaveProgress();
-  typingSetStatus('這一句已核對完成。可以再聽一次確認，也可以前往下一句。','good');
+  typingStatus={message:'這一句已核對完成。可以再聽一次確認，也可以前往下一句。',type:'good'};render();
  }else typingSetStatus('這一句還有不同的字。可以再聽一次，或打開注音提示後修改。');
 }
 function typingRevealCopy(){
@@ -222,7 +235,7 @@ function typingSelectTone(value){
  const lesson=typingLesson(),tone=lesson.tones[typingToneIndex];
  if(value===tone.tone){
   typingProgress().toneDone[typingToneIndex]=true;typingSaveProgress();
-  typingSetStatus('這個字的聲調判斷正確。可以繼續下一題。','good');
+  typingStatus={message:'這個字的聲調判斷正確。可以繼續下一題。',type:'good'};render();
  }else typingSetStatus('再看一次注音的聲調符號，必要時按「報讀詞語」再聽。');
 }
 function typingToneNext(amount){
@@ -235,7 +248,7 @@ function typingFeedback(){
 }
 function renderAnnotatedTyping(){
  const lesson=typingLesson();
- let h='<section class="card"><div class="toolbar"><button onclick="openDay('+view.week+','+view.day+')">返回本主題選單</button><button onclick="goHome()">返回主題首頁</button></div>';
+ let h='<section class="card"><div class="toolbar">'+(view.mode==='typing'?'':'<button onclick="openDay('+view.week+','+view.day+')">返回本主題選單</button>')+'<button onclick="goHome()">返回主題首頁</button></div>';
  if(!lesson){
   return h+'<h2>注音短文暫時無法載入</h2><p>請確認網路連線後重新整理頁面；原有其他練習不受影響。</p></section>';
  }
@@ -425,6 +438,11 @@ function renderLegacySections(item){
   '<div class="topic-sub-body"><p class="muted">'+esc(item.description||'')+'</p>'+rows.join('')+'</div></details>';
 }
 function topicItem(item){
+ if(item.type==='typing-passages'){
+  return '<div class="topic-item"><strong>'+esc(item.title)+'</strong><p class="muted">'+esc(item.description||'')+
+   '</p><div class="toolbar">'+typingPassages.map(p=>'<button class="primary" onclick="openTypingPassage(\''+esc(p.id)+'\')">'+
+   esc(p.title)+'</button>').join('')+'</div></div>';
+ }
  if(item.type==='page'){
   const href=safeTopicLink(item.href);
   if(href==='#')return '';
@@ -649,12 +667,12 @@ function finished(){
  return `<section class="card"><h2>${labels[view.section]}完成</h2><p class="stars">${'★'.repeat(p.star||1)}${'☆'.repeat(3-(p.star||1))}</p><p>第一次答對 ${p.correct} / ${qs().length} 題。語音辨識不是口說清晰程度的正式評量。</p><div class="toolbar"><button class="primary" onclick="${idx<5?`start(${view.week},${view.day},'${sectionList[idx+1]}')`:`openDay(${view.week},${view.day})`}">${idx<5?'下一項練習':'返回本主題選單'}</button><button onclick="openDay(${view.week},${view.day})">查看本主題的練習</button></div></section>`;
 }
 function render(){
- app.innerHTML=view.mode==='home'?showHome():view.mode==='day'?showDay():view.mode==='practice'?renderPractice():finished();
+ app.innerHTML=view.mode==='home'?showHome():view.mode==='day'?showDay():view.mode==='practice'?renderPractice():view.mode==='typing'?renderAnnotatedTyping():finished();
 }
 // 測試路徑顯示所有課程；正式首頁仍依 GitHub 設定限制開放。
 const remoteRefresh=refreshCourseSettings;
 refreshCourseSettings=async function(){
- if(location.protocol==='file:'||location.protocol==='about:'||location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.pathname.includes('/teacher-preview/')){courseSettings={...PREVIEW_COURSE};courseStatus='preview';if(view.mode==='practice'&&!canOpen(view.week,view.day))view.mode='home';render();return}
+ if(location.protocol==='file:'||location.protocol==='about:'||location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.pathname.includes('/teacher-preview/')){courseSettings={...PREVIEW_COURSE};courseStatus='preview';await loadTypingPassages();if(view.mode==='practice'&&!canOpen(view.week,view.day))view.mode='home';render();return}
  return remoteRefresh();
 };
 app.innerHTML='<section class="card"><h1>生活自立學習站</h1><p>正在讀取教師開放設定……</p></section>';
