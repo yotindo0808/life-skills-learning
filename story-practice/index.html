@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>大吉｜故事閱讀、資訊提取與雙向對話</title>
+<style>
+:root{--ink:#193741;--teal:#186b75;--bg:#f3f7f6;--line:#cadbd9;--muted:#51646a;--soft:#e5f3ee;--gold:#9b6526}
+*{box-sizing:border-box}body{font-family:"Noto Sans TC","Microsoft JhengHei","PingFang TC",sans-serif;background:var(--bg);color:var(--ink);font-size:18px;line-height:1.58;margin:0}
+button,input,textarea{font:inherit}button{padding:10px 15px;border-radius:11px;border:1px solid #a9c4c1;background:white;color:var(--ink);cursor:pointer;min-height:45px}button.primary{color:white;background:var(--teal);border-color:var(--teal);font-weight:700}
+button:disabled{opacity:.5;cursor:not-allowed}button:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #dc9e3b;outline-offset:3px}
+a{color:#17656d}h1{font-size:23px;margin:0;line-height:1.3}h2{font-size:21px;margin:0 0 11px;line-height:1.4}p{margin:8px 0 13px}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:#fff;border-bottom:1px solid var(--line);padding:10px max(15px,calc((100% - 1220px)/2))}
+header strong{font-size:18px}header a{font-size:16px}
+main{max-width:1220px;margin:auto;padding:12px 16px}
+.heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:11px}
+.muted{color:var(--muted);font-size:15px}.small{font-size:15px}.pill{background:var(--soft);color:#195660;border-radius:999px;padding:5px 10px;font-size:14px;font-weight:700}
+.tabs{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:7px 0 12px}.tabs button[aria-current="page"]{background:var(--soft);border-color:var(--teal);font-weight:700}
+.workspace{display:grid;grid-template-columns:minmax(0,1.04fr) minmax(0,1fr);gap:13px;align-items:stretch;min-height:390px}
+.panel{background:#fff;border:1px solid #d8e5e2;border-radius:16px;padding:19px 20px;min-width:0}
+.context{background:var(--soft);border-color:#b9d7cf}.context p{font-size:19px;line-height:1.77}
+.context-title{font-size:15px;color:var(--muted);font-weight:700;margin-bottom:7px}
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:11px 0 0}
+.answer-modes{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 12px}.answer-modes button{flex:1;white-space:nowrap;padding:8px 9px;font-size:16px}
+.answer-modes button[aria-pressed="true"]{background:var(--soft);border-color:var(--teal);font-weight:700}
+.option{display:grid;grid-template-columns:1fr auto;align-items:stretch;gap:7px;margin-bottom:8px}
+.option .choose{min-height:56px;text-align:left;padding:9px 12px;font-size:18px;line-height:1.48}
+.option .readopt{width:48px;padding:6px}
+textarea{min-height:148px;width:100%;padding:12px 14px;border-radius:11px;border:2px solid #aac4c1;resize:vertical;line-height:1.65;color:var(--ink);font-size:18px}
+label{display:block;font-weight:700;margin-bottom:8px}
+.feedback{border-radius:11px;padding:11px 12px;margin-top:11px;background:#f4f8f7;font-size:16px}
+.feedback.good{background:#e2f4e7;color:#205b34}
+.feedback.warn{background:#fff2d7;color:#7b531d}
+.prompt{background:#fff;border:1px solid var(--line);padding:11px 12px;border-radius:11px}
+progress{width:100%;height:11px;accent-color:var(--teal)}
+audio{max-width:100%;width:100%;margin:6px 0}
+.footer{margin-top:11px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:center}
+.footer button{font-size:16px}.info{font-size:14px;color:var(--muted);margin-top:12px}
+#liveStatus{min-height:0}
+@media(min-width:800px) and (orientation:landscape){body{height:100dvh;overflow:hidden}main{height:calc(100dvh - 58px);display:flex;flex-direction:column;min-height:0}.workspace{flex:1;min-height:0}.panel{overflow-y:auto;overscroll-behavior:contain}}
+@media(max-width:799px){body{font-size:17px}main{padding:10px}.workspace{grid-template-columns:1fr}.panel{padding:15px}.context p{font-size:18px}.option .choose{font-size:17px}.answer-modes button{flex:1 1 110px}}
+@media(max-height:680px) and (min-width:800px){main{padding-top:7px}.heading{margin-bottom:6px}.tabs{margin:3px 0 6px}.panel{padding:12px 15px}.context p{font-size:18px}h2{font-size:19px}}
+</style></head><body>
+<header><strong>大吉的故事閱讀與對話練習</strong><a href="../">返回原本學習站</a></header>
+<main>
+<div class="heading"><div><h1>活動通知改變了｜故事理解與表達</h1><div class="muted">模擬生活故事｜先讀故事，再練習提取資訊、重述與接續話題</div></div><span class="pill" id="progressTitle">讀故事</span></div>
+<nav class="tabs" aria-label="課程步驟"><button type="button" id="readTab" onclick="showReading()">① 閱讀故事</button><button type="button" id="questionTab" onclick="showQuestions()">② 回答問題</button><button type="button" id="summaryTab" onclick="showSummary()">③ 查看紀錄</button></nav>
+<div class="workspace"><section id="leftPane" class="panel context" aria-label="故事與情境"></section><section id="rightPane" class="panel" aria-label="目前學習任務"></section></div>
+<div class="info">學習內容與文字作答暫存於此裝置；錄音可儲存在此裝置並下載，但不會自動傳送給老師。語音辨識功能視瀏覽器支援情況而定。</div>
+</main><script>
+"use strict";
+const STORY=[
+ {title:"收到兩份不同的通知",text:"大吉報名了星期四下午的數位攝影活動。他之前看到的活動公告寫著，下午三點在圖書館二樓教室上課，參加的人需要提前十五分鐘報到。大吉把舊公告的內容記在自己的筆記裡。"},
+ {title:"活動時間與地點改變了",text:"星期二晚上，大吉收到一則新的活動通知。通知說，因為二樓教室當天要進行設備檢修，活動地點改到一樓多功能教室，開始時間也提前到下午兩點半。主辦單位提醒參加者，必須在下午兩點十五分以前完成報到。活動內容與需要攜帶的物品沒有改變。"},
+ {title:"阿哲只看過舊公告",text:"星期三，大吉和一起報名的阿哲聊天。阿哲拿出之前儲存的公告，說：「我記得活動是三點開始，我們兩點四十五分到就可以了。」大吉知道阿哲看到的是舊公告，但他沒有立刻說明改變的資訊。他先談起活動講師以前拍過的日本街景照片，又提到自己看過的一部日本妖怪影片。"},
+ {title:"對方想先知道活動資訊",text:"阿哲聽了一會兒，回答：「那聽起來很有趣。不過，我現在比較想知道明天幾點要到圖書館。」大吉這才拿出新的通知，說活動時間已經改變。阿哲問：「為什麼改時間？地點是不是也換了？」大吉解釋了教室更換的原因，卻一時忘了說新的報到時間。阿哲只好再問：「所以我們明天到底幾點要到？」"},
+ {title:"確認資訊，也能繼續分享",text:"兩人重新看過通知，確認了新的報到時間與活動地點。阿哲又問：「你剛才說的日本街景照片，是這次攝影課會介紹的內容嗎？」大吉發現，活動通知沒有寫到這件事。這是他自己另外想分享的話題。他需要把通知中已確認的資訊，和自己感興趣但尚未確認的內容分開說清楚。"}
+];
+const QUESTIONS=[
+ {id:"Q1",title:"哪些重要資訊改變了？",prompt:"比較舊公告和新通知，哪一項說明最完整？",scene:1,choices:["開始時間、報到時間、教室都更改，活動內容及攜帶物品不變。","只有教室換到一樓，報到與開始時間維持原樣。","活動內容與要帶的物品改了，時間和地點沒有改。"],answer:0,help:"比對兩份通知的開始時間、報到時間、活動地點，並注意哪些事情沒有改變。",check:"可以清楚說出：14:30 開始、14:15 前報到、一樓多功能教室；活動內容與物品沒變。"},
+ {id:"Q2",title:"阿哲為什麼還不知道？",prompt:"阿哲已經知道有這場攝影活動，為什麼還是反覆問時間？",scene:3,choices:["他想知道攝影活動會不會介紹日本照片。","大吉說了更換原因，卻沒有先完整說出新報到時間。","阿哲並不知道自己報名了哪一場活動。"],answer:1,help:"想想阿哲在對話中缺少哪一個當下最需要的資訊。",check:"說明阿哲手上是舊公告，而且大吉一度沒有交代新的報到時間。"},
+ {id:"Q3",title:"如何接續對方正在談的內容？",prompt:"阿哲說：「我現在比較想知道明天幾點要到圖書館。」大吉可以如何接續？",scene:3,choices:["「我最喜歡的妖怪影片裡有很多日本街景。」","「你不用擔心，我們到時候再說。」","「好，我先確認新通知：要在下午兩點十五分前報到。」"],answer:2,help:"先回答對方正在詢問的資訊，再考慮是否分享另一個話題。",check:"回應阿哲想知道的報到時間，若需要再補充活動地點。"},
+ {id:"Q4",title:"告訴家人最重要的資訊",prompt:"如果要向家人說明星期四活動的變動，哪些內容是優先要說的？",scene:1,choices:["新的報到時間、開始時間、教室位置，以及變動的原因。","老師以前拍過哪些照片，以及大吉喜歡哪部妖怪影片。","只說有一場攝影活動，不用補充任何改變。"],answer:0,help:"想想家人需要知道什麼，才能準時送大吉到正確教室。",check:"先交代時間與地點，必要時補充變動原因，不必把所有細節都放進去。"},
+ {id:"Q5",title:"用自己的話重述整件事",prompt:"請將事件告訴一位沒有看過故事的人：發生了什麼事？阿哲為什麼需要新資訊？最後怎麼確認？",scene:2,choices:["大吉聊了日本的街景，阿哲覺得很有趣。這就是整件事情。","攝影活動的時間和地點換了。阿哲只看過舊公告，大吉一開始沒有說清楚；兩人後來查看新通知，確認報到時間和教室。","阿哲不想參加攝影活動，所以大吉決定把活動取消。"],answer:1,help:"依照「事情起因 → 雙方知道的資訊 → 對話經過 → 最後結果」說清楚。",check:"建議包含：通知更改、阿哲持有舊資訊、大吉一度沒有說清楚、兩人最後確認新資訊。"},
+ {id:"Q6",title:"區分已知資訊與想分享的話題",prompt:"阿哲問：「這次攝影課真的會介紹日本街景嗎？」大吉如何回答，才能清楚又能延續對話？",scene:4,choices:["「通知沒有寫這部分，我還不能確定。剛才是我另外想分享的照片。你對日本街景有興趣嗎？」","「我以前看過很多妖怪電影，裡面都有街景，你一定要聽。」","「一定有，因為那位講師以前有拍過日本照片。」"],answer:0,help:"把通知明確寫出的內容，與自己感興趣但未經確認的事情分開說。",check:"能表示「通知沒寫、目前不確定」，並視對方的回應決定是否繼續分享。"}
+];
+const KEY="life-da-ji-story-v1";
+let state={page:"read",scene:0,question:0,mode:"choice",answers:{},revealed:{},readCompleted:false};
+try{const x=JSON.parse(localStorage.getItem(KEY)||"{}");if(x&&typeof x==="object"){state.page=["read","questions","summary"].includes(x.page)?x.page:"read";state.scene=Number.isInteger(x.scene)?Math.max(0,Math.min(4,x.scene)):0;state.question=Number.isInteger(x.question)?Math.max(0,Math.min(5,x.question)):0;state.mode=["choice","speech","typing"].includes(x.mode)?x.mode:"choice";state.answers=x.answers&&typeof x.answers==="object"?x.answers:{};state.revealed=x.revealed&&typeof x.revealed==="object"?x.revealed:{};state.readCompleted=!!x.readCompleted}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){console.warn("此裝置無法儲存文字作答",e)}}
+function e(t){return String(t).replace(/[&<>"']/g,function(x){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[x]})}
+function speak(t){if(!("speechSynthesis" in window)){alert("這個瀏覽器無法使用文字報讀。");return}try{window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(String(t));u.lang="zh-TW";u.rate=.87;u.pitch=1;window.speechSynthesis.speak(u)}catch(err){alert("目前無法報讀，請檢查裝置音量。")}}
+function stopSpeak(){try{window.speechSynthesis.cancel()}catch(e){}}
+function sayStory(n){speak(STORY[n].title+"。"+STORY[n].text)}
+function sayAll(){speak(STORY.map(s=>s.title+"。"+s.text).join("。"))}
+function answerFor(id){if(!state.answers[id]||typeof state.answers[id]!=="object")state.answers[id]={};return state.answers[id]}
+function countDone(){return QUESTIONS.filter(q=>{const a=state.answers[q.id]||{};return a.choiceCorrect||a.typingSubmitted||a.speechSubmitted}).length}
+function showReading(){stopSpeak();stopCapture();state.page="read";save();render()}
+function showQuestions(){stopSpeak();stopCapture();state.page="questions";save();render()}
+function showSummary(){stopSpeak();stopCapture();state.page="summary";save();render()}
+function changeScene(delta){state.scene=Math.max(0,Math.min(STORY.length-1,state.scene+delta));if(state.scene===STORY.length-1)state.readCompleted=true;save();render()}
+function nextScene(){if(state.scene===STORY.length-1){state.readCompleted=true;showQuestions()}else changeScene(1)}
+function changeQ(delta){stopSpeak();stopCapture();state.question=Math.max(0,Math.min(QUESTIONS.length-1,state.question+delta));save();render()}
+function setMode(m){if(!["choice","speech","typing"].includes(m))return;stopSpeak();stopCapture();state.mode=m;save();render()}
+function reveal(){const q=QUESTIONS[state.question];state.revealed[q.id]=true;const a=answerFor(q.id);a.hints=(a.hints||0)+1;save();render()}
+function render(){
+ const pt=document.getElementById("progressTitle"),left=document.getElementById("leftPane"),right=document.getElementById("rightPane");
+ pt.textContent=state.page==="read"?"故事第 "+(state.scene+1)+"／5 段":state.page==="questions"?"第 "+(state.question+1)+"／6 題，已完成 "+countDone()+" 題":"我的學習紀錄";
+ document.getElementById("readTab").setAttribute("aria-current",state.page==="read"?"page":"false");
+ document.getElementById("questionTab").setAttribute("aria-current",state.page==="questions"?"page":"false");
+ document.getElementById("summaryTab").setAttribute("aria-current",state.page==="summary"?"page":"false");
+ if(state.page==="read"){renderReading(left,right);return}
+ if(state.page==="summary"){renderSummary(left,right);return}
+ renderQuestions(left,right);
+}
+function renderReading(left,right){
+ const s=STORY[state.scene];
+ left.innerHTML='<div class="context-title">虛構故事｜第 '+(state.scene+1)+' 段</div><h2>'+e(s.title)+'</h2><p>'+e(s.text)+'</p><div class="toolbar"><button onclick="sayStory('+state.scene+')">🔊 報讀本段</button><button onclick="sayAll()">🔊 報讀全文</button><button onclick="stopSpeak()">停止報讀</button></div>';
+ right.innerHTML='<h2>先理解故事內容</h2><p>請讀完這一段，再想一想：這段話提供了哪些新資訊？你會怎麼向別人說明？</p><div class="prompt"><strong>閱讀提示：</strong><div>'+e(["原本活動怎麼安排？","哪些資訊更改？哪些沒有？","阿哲掌握的是哪份資訊？","阿哲目前真正想知道什麼？","怎麼區分通知內容和個人興趣？"][state.scene])+'</div></div><div class="toolbar"><button onclick="changeScene(-1)" '+(state.scene===0?"disabled":"")+'>上一段</button><button class="primary" onclick="nextScene()">'+(state.scene===4?"開始回答問題":"下一段")+'</button></div><p class="muted">不用追求閱讀速度。回答時可選擇點選、口說或打字，也能重新查看故事。</p>';
+}
+function renderQuestions(left,right){
+ const q=QUESTIONS[state.question],a=answerFor(q.id),seen=!!state.revealed[q.id];
+ left.innerHTML='<div class="context-title">故事回顧｜'+e(q.title)+'</div><h2>先回想剛才讀到什麼</h2><p>可以先不看故事，嘗試回答右側問題。需要時再查看原文。</p><div class="toolbar"><button onclick="reveal()">📖 查看相關故事段落</button><button onclick="speak(STORY['+q.scene+'].text)">🔊 報讀相關段落</button></div>'+(seen?'<div class="prompt"><strong>'+e(STORY[q.scene].title)+'</strong><p>'+e(STORY[q.scene].text)+'</p></div>':'<div class="feedback">目前沒有顯示原文。若忘記內容，可使用上方提示。</div>')+'<p class="small muted">查看故事不代表答錯，系統只記錄使用提示的次數。</p>';
+ let html='<h2>第 '+(state.question+1)+' 題｜'+e(q.title)+'</h2><div class="prompt"><strong>'+e(q.prompt)+'</strong><div class="toolbar"><button onclick="speak(QUESTIONS['+state.question+'].prompt)">🔊 報讀題目</button><button onclick="stopSpeak()">停止報讀</button></div></div><div class="answer-modes" aria-label="選擇作答方式"><button aria-pressed="'+(state.mode==="choice")+'" onclick="setMode(\'choice\')">選擇題</button><button aria-pressed="'+(state.mode==="speech")+'" onclick="setMode(\'speech\')">口說回答</button><button aria-pressed="'+(state.mode==="typing")+'" onclick="setMode(\'typing\')">打字回答</button></div>';
+ if(state.mode==="choice"){html+=q.choices.map((v,i)=>'<div class="option"><button class="choose" onclick="pick('+i+')">'+(i+1)+'．'+e(v)+'</button><button class="readopt" aria-label="報讀選項 '+(i+1)+'" onclick="speak(QUESTIONS['+state.question+'].choices['+i+'])">🔊</button></div>').join("");
+ if(a.choiceCorrect)html+='<div class="feedback good">這題已選到符合故事的答案。'+e(q.help)+'</div>';
+ else if(a.choiceTried)html+='<div class="feedback warn">這個選項與故事內容不完全相符。請重新讀題或查看相關段落。</div>';
+ }
+ if(state.mode==="typing"){html+='<label for="typedAnswer">用自己的話回答</label><textarea id="typedAnswer" autocomplete="off" placeholder="請自行說明，不需要照抄故事" oninput="typeChange(this.value)">'+e(a.typed||"")+'</textarea><div class="toolbar"><button class="primary" onclick="submitTyped()">儲存這次打字回答</button><button onclick="speak(QUESTIONS['+state.question+'].check)">🔊 聽檢查提示</button></div>';
+ if(a.typingSubmitted)html+='<div class="feedback good">文字已儲存，尚未由教師評閱。請自行檢查：'+e(q.check)+'</div>';
+ }
+ if(state.mode==="speech"){html+='<p class="small">先用自己的話說明。可錄音並回聽；如果此瀏覽器支援，也可以嘗試語音轉文字。</p><div class="toolbar"><button id="recordButton" class="primary" onclick="toggleRecord()">🎙️ 開始錄音</button><button id="recognizeButton" onclick="startRecognize()" '+(!recognitionSupported()?"disabled":"")+'>🎤 語音轉文字</button></div><div id="recordStatus" class="feedback" role="status">錄音需允許麥克風權限。語音轉文字不一定支援 iPad 瀏覽器。</div><div id="audioResult" data-id="'+q.id+'"></div><label for="speechText">口說內容的文字紀錄（選填）</label><textarea id="speechText" placeholder="語音辨識結果或使用鍵盤上的麥克風輸入" oninput="speechTextChange(this.value)">'+e(a.spokenText||"")+'</textarea><div class="toolbar"><button class="primary" onclick="submitSpeech()">確認已完成口說練習</button><button onclick="speak(QUESTIONS['+state.question+'].check)">🔊 聽檢查提示</button></div>';
+ if(a.speechSubmitted)html+='<div class="feedback good">已記錄口說練習完成；錄音及語音辨識不等於口語能力評分。請自行檢查：'+e(q.check)+'</div>';
+ }
+ html+='<div class="footer"><button onclick="changeQ(-1)" '+(state.question===0?"disabled":"")+'>上一題</button><button class="primary" onclick="'+(state.question===5?"showSummary()":"changeQ(1)")+'">'+(state.question===5?"查看紀錄":"下一題")+'</button></div>';
+ right.innerHTML=html;
+ if(state.mode==="speech")loadAudio(q.id);
+}
+function pick(i){const q=QUESTIONS[state.question],a=answerFor(q.id);a.choiceAttempts=(a.choiceAttempts||0)+1;a.choiceTried=true;if(i===q.answer)a.choiceCorrect=true;save();render()}
+function typeChange(v){const q=QUESTIONS[state.question],a=answerFor(q.id);a.typed=String(v).slice(0,1200);a.typingSubmitted=false;save()}
+function submitTyped(){const q=QUESTIONS[state.question],a=answerFor(q.id);const v=document.getElementById("typedAnswer").value.trim();if(v.length<6){alert("請先用自己的話輸入較完整的回答。");return}a.typed=v;a.typingSubmitted=true;save();render()}
+function speechTextChange(v){const q=QUESTIONS[state.question],a=answerFor(q.id);a.spokenText=String(v).slice(0,1200);save()}
+function submitSpeech(){const q=QUESTIONS[state.question],a=answerFor(q.id);if(!a.hasAudio&&!(a.spokenText||"").trim()){alert("請先錄下口說，或使用語音輸入文字。");return}a.speechSubmitted=true;save();render()}
+function renderSummary(left,right){
+ const done=countDone();
+ left.innerHTML='<h2>本次練習進度</h2><p>已完成 '+done+'／6 題（含任何一種作答方式）。</p><progress value="'+done+'" max="6"></progress><p class="muted">選擇題會自動核對。打字與口說只記錄回答，不能自動判定故事理解或口語表達是否正確。</p><p>故事提供的資訊：原公告 15:00 開始、14:45 報到、二樓教室；新通知 14:30 開始、14:15 前報到、一樓多功能教室。</p><div class="toolbar"><button onclick="showQuestions()">返回題目</button><button onclick="sayAll()">🔊 再聽故事</button></div>';
+ right.innerHTML='<h2>作答紀錄</h2>'+QUESTIONS.map((q,i)=>{const a=state.answers[q.id]||{};const st=a.choiceCorrect?"選擇題已答對":a.typingSubmitted?"已提交文字":a.speechSubmitted?"已練習口說":"尚未完成";return '<div class="prompt" style="margin:0 0 8px"><strong>'+(i+1)+'．'+e(q.title)+'</strong><div class="small">'+st+'；提示 '+(a.hints||0)+' 次</div>'+(a.typed?'<div class="small">打字：'+e(a.typed)+'</div>':'')+(a.spokenText?'<div class="small">口說文字：'+e(a.spokenText)+'</div>':'')+'</div>'}).join("")+'<div class="toolbar"><button class="primary" onclick="downloadSummary()">下載文字作答紀錄</button></div><p class="muted">若有錄音，請返回各題的口說頁面個別下載音檔。網站不會自動把作答傳送給老師。</p>';
+}
+function downloadSummary(){
+ let lines=["大吉｜活動通知改變了｜練習文字紀錄","下載時間："+new Date().toLocaleString("zh-TW"),"注意：口說、打字未經教師自動評分。",""];
+ QUESTIONS.forEach((q,i)=>{let a=state.answers[q.id]||{};lines.push((i+1)+"．"+q.title,"選擇題："+(a.choiceCorrect?"正確":a.choiceTried?"尚未答對":"未作答"),"打字："+(a.typed||"未作答"),"口說練習："+(a.speechSubmitted?"已完成":"未確認"),"口說文字："+(a.spokenText||"無"),"提示次數："+(a.hints||0),"")});
+ const blob=new Blob([lines.join("\n")],{type:"text/plain;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="大吉_故事閱讀與對話_作答紀錄.txt";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+let recorder=null,recorderStream=null,recordingId="",recordChunks=[],recordingBusy=false,recognizer=null;
+let recordedUrls={};
+function audioMime(){if(!window.MediaRecorder)return"";for(const t of ["audio/mp4","audio/webm;codecs=opus","audio/webm"]){if(typeof MediaRecorder.isTypeSupported==="function"&&MediaRecorder.isTypeSupported(t))return t}return""}
+async function toggleRecord(){
+ if(recorder&&recorder.state==="recording"){recorder.stop();return}
+ if(recordingBusy)return;
+ const q=QUESTIONS[state.question],id=q.id,st=document.getElementById("recordStatus"),bt=document.getElementById("recordButton");
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){if(st)st.textContent="此瀏覽器不支援頁內錄音。可改用打字欄位與 iPad 鍵盤的語音輸入。";return}
+ recordingBusy=true;bt.disabled=true;
+ try{
+  stopSpeak();stopRecognize();
+  recorderStream=await navigator.mediaDevices.getUserMedia({audio:true});
+  const mt=audioMime();recorder=mt?new MediaRecorder(recorderStream,{mimeType:mt}):new MediaRecorder(recorderStream);
+  recordingId=id;recordChunks=[];
+  recorder.ondataavailable=ev=>{if(ev.data&&ev.data.size)recordChunks.push(ev.data)};
+  recorder.onerror=()=>{if(st)st.textContent="錄音發生錯誤，請再試一次。"};
+  recorder.onstop=async()=>{
+   const blob=new Blob(recordChunks,{type:recorder.mimeType||mt||"audio/mp4"});
+   if(recorderStream){recorderStream.getTracks().forEach(t=>t.stop());recorderStream=null}
+   recorder=null;recordingBusy=false;
+   if(blob.size){audioMap[id]=blob;const a=answerFor(id);a.hasAudio=true;save();await putAudio(id,blob);if(state.page==="questions"&&QUESTIONS[state.question].id===id){loadAudio(id);let rs=document.getElementById("recordStatus");if(rs)rs.textContent="錄音完成。請播放回聽，並確認是否說清楚。"}}
+   else{let rs=document.getElementById("recordStatus");if(rs)rs.textContent="沒有取得有效錄音，請重試。"}
+   const button=document.getElementById("recordButton");if(button){button.disabled=false;button.textContent="🎙️ 再錄一次"}
+  };
+  recorder.start();recordingBusy=false;bt.disabled=false;bt.textContent="■ 停止錄音";if(st)st.textContent="錄音中。請說完後按「停止錄音」。";
+ }catch(err){recordingBusy=false;if(recorderStream){recorderStream.getTracks().forEach(t=>t.stop());recorderStream=null}bt.disabled=false;if(st)st.textContent="無法使用麥克風。請檢查權限，或使用鍵盤語音輸入。"}
+}
+function stopCapture(){
+ if(recorder&&recorder.state==="recording"){try{recorder.stop()}catch(e){}}
+ stopRecognize();
+}
+function recognitionSupported(){return !!(window.SpeechRecognition||window.webkitSpeechRecognition)}
+function stopRecognize(){if(recognizer){try{recognizer.abort()}catch(e){}recognizer=null}}
+function startRecognize(){
+ const R=window.SpeechRecognition||window.webkitSpeechRecognition;
+ const st=document.getElementById("recordStatus");
+ if(!R){if(st)st.textContent="本瀏覽器不支援語音轉文字，可使用頁內錄音或鍵盤語音輸入。";return}
+ if(recorder&&recorder.state==="recording"){if(st)st.textContent="請先結束錄音，再開始語音轉文字。";return}
+ stopSpeak();stopRecognize();const id=QUESTIONS[state.question].id;let r;
+ try{r=new R();r.lang="zh-TW";r.interimResults=false;r.continuous=false;r.maxAlternatives=1;recognizer=r;
+ r.onresult=ev=>{let words=Array.from(ev.results).map(x=>x[0]&&x[0].transcript||"").join("");const a=answerFor(id);a.spokenText=((a.spokenText||"")+" "+words).trim();save();const tx=document.getElementById("speechText");if(tx&&QUESTIONS[state.question].id===id)tx.value=a.spokenText;if(st)st.textContent="已取得語音辨識文字。請自行核對是否與原本說的話相同。"};
+ r.onerror=ev=>{if(st)st.textContent="語音辨識無法完成："+String(ev.error||"裝置或權限限制")+"。可改用頁內錄音。"};
+ r.onend=()=>{if(recognizer===r)recognizer=null};r.start();if(st)st.textContent="正在聆聽口說回答……語音辨識結果僅供參考。";
+ }catch(err){if(st)st.textContent="此瀏覽器目前不能進行語音辨識。請改用錄音或鍵盤輸入。"}
+}
+const audioMap={};let audioDbPromise=null;
+function dbOpen(){if(!window.indexedDB)return Promise.reject(Error("IndexedDB not available"));if(!audioDbPromise)audioDbPromise=new Promise((resolve,reject)=>{const r=indexedDB.open("life-da-ji-story-audio-v1",1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains("clips"))r.result.createObjectStore("clips")};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)});return audioDbPromise}
+async function putAudio(id,blob){try{const db=await dbOpen();await new Promise((resolve,reject)=>{const tx=db.transaction("clips","readwrite");tx.objectStore("clips").put(blob,id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)})}catch(e){const st=document.getElementById("recordStatus");if(st)st.textContent="錄音可在本次開啟時回聽，但此裝置無法永久儲存；請立即下載音檔。"}}
+async function getAudio(id){try{const db=await dbOpen();return await new Promise((resolve,reject)=>{const tx=db.transaction("clips","readonly"),r=tx.objectStore("clips").get(id);r.onsuccess=()=>resolve(r.result||null);r.onerror=()=>reject(r.error)})}catch(e){return null}}
+async function loadAudio(id){
+ const target=document.getElementById("audioResult");if(!target||target.dataset.id!==id)return;
+ const blob=audioMap[id]||await getAudio(id);
+ if(!blob||!target.isConnected||target.dataset.id!==id)return;
+ audioMap[id]=blob;if(recordedUrls[id])URL.revokeObjectURL(recordedUrls[id]);recordedUrls[id]=URL.createObjectURL(blob);
+ target.innerHTML='<label>回聽剛才的口說</label><audio controls preload="none" src="'+recordedUrls[id]+'"></audio><a href="'+recordedUrls[id]+'" download="大吉_口說練習_'+id+(blob.type.includes("mp4")?".m4a":".webm")+'">下載這一題的錄音檔</a>';
+}
+render();
+</script></body></html>
