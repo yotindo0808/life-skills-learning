@@ -13,7 +13,7 @@
 *{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:22px/1.5 "Bpmf Iansui","Noto Sans TC","PingFang TC","Heiti TC",sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
-button{font:inherit;color:inherit;border:0;cursor:pointer;border-radius:16px;min-height:56px;padding:10px 22px}
+button{touch-action:manipulation;-webkit-touch-callout:none;font:inherit;color:inherit;border:0;cursor:pointer;border-radius:16px;min-height:56px;padding:10px 22px}
 button:focus-visible{outline:4px solid var(--help);outline-offset:2px}
 .app{display:grid;grid-template-rows:64px 1fr 96px;height:100vh;height:100dvh}
 .top{display:flex;align-items:center;gap:16px;padding:0 20px;border-bottom:1px solid var(--line);background:#fff}
@@ -91,7 +91,7 @@ button:focus-visible{outline:4px solid var(--help);outline-offset:2px}
     <span class="tag">練習用</span>
     <div class="title" id="title"></div>
     <div class="dots" id="dots"></div>
-    <button class="tbtn" id="tbtn" aria-label="老師（按住一秒）">老師</button>
+    <button class="tbtn" id="tbtn" aria-label="老師">老師</button>
   </header>
   <main class="main">
     <section class="left" id="left"></section>
@@ -237,7 +237,6 @@ function speakText(){const s=S[cur];if(s.card){const c=s.card;return c.me?`${c.s
 function render(){
  const s=S[cur];$('title').textContent=s.title;
  $('dots').innerHTML=S.map((x,i)=>`<i class="${i===cur?'on':i<cur?'done':''}"></i>`).join('');
- $('wait').textContent=doneFlag[cur]?'做好了，等老師看一下':'';
  let L='',R='';
  if(s.key==='flow'){
   L=`<ul class="list">${SECS.slice(1,4).map((t,i)=>`<li><b>${i+1}</b>${t}</li>`).join('')}</ul>`;
@@ -259,7 +258,7 @@ function render(){
   else if(!askList.length){L=`<div class="scene">家人都聽懂了！</div>`;R=`<div class="q">你說得很完整。</div>`}
   else{const e=askList[askIdx];
    L=`<div class="icons" style="grid-template-columns:minmax(0,1fr);max-width:220px"><div>${elIcon(e)}${e.k}</div></div><div class="sub">第 ${askIdx+1} 張，共 ${askList.length} 張</div>`;
-   R=`<div class="card"><div class="sub">家人想知道：</div><div class="q">${e.q}</div></div>${recBlock('ask','追問：'+e.k)}${askIdx<askList.length-1?`<button class="reveal" data-nextask="1">下一張</button>`:''}`}}
+   R=`<div class="card"><div class="sub">家人想知道：</div><div class="q">${e.q}</div></div>${recBlock('ask','追問：'+e.k)}`}}
  else if(s.key==='rec2'){
   L=`<div class="icons">${EL.map(e=>`<div>${elIcon(e)}${e.k}</div>`).join('')}</div>`;
   R=`<div class="q">看左邊的六個提示，把整件事從頭再說一次。</div>${recBlock('rec2','錄音二')}`}
@@ -303,16 +302,23 @@ document.addEventListener('click',e=>{
  if(t.dataset.opt){choice[s.key]=t.dataset.opt;log('選擇',{選項:t.dataset.opt});render();return}
  if(t.dataset.nextask){askIdx=Math.min(askIdx+1,askList.length-1);render();speak(speakText());return}
 });
-$('bDone').onclick=()=>{doneFlag[cur]=true;log('我做好了',{});render()};
-$('bHelp').onclick=()=>{log('我需要幫忙',{});const b=$('banner');b.textContent='老師知道了，等一下喔。';bpFix(b);b.style.display='block';setTimeout(()=>b.style.display='none',2500)};
+function note(m){const b=$('banner');b.textContent=m;bpFix(b);b.style.display='block';clearTimeout(note.t);note.t=setTimeout(()=>b.style.display='none',2500)}
+$('bDone').onclick=()=>{const s=S[cur];
+ if(rec&&rec.state==='recording'){note('先按「說完了，停止」喔。');return}
+ if((s.key==='rec1'||s.key==='rec2')&&!clips.some(c=>c.key===s.key)){note('先按紅色按鈕錄音喔。');return}
+ if(s.key==='ask'){
+  if(!s._sent){note('請等一下，老師在聽你的錄音。');return}
+  if(askList.length&&!clips.some(c=>c.label==='追問：'+askList[askIdx].k)){note('先按紅色按鈕回答喔。');return}
+  if(askIdx<askList.length-1){log('我做好了',{});askIdx++;render();speak(speakText());return}}
+ if((s.key==='listen'||s.key==='mood')&&!choice[s.key]){note('先選一個答案喔。');return}
+ log('我做好了',{});if(s.key==='end'){note('今天的課完成了！');return}
+ cur++;render();speak(speakText())};
+$('bHelp').onclick=()=>{log('我需要幫忙',{});note('老師知道了，等一下喔。')};
 $('bAgain').onclick=()=>{log('再聽一次',{});speak(speakText())};
 
 /* ---------- 教師面板 ---------- */
-let holdT=null;const tb=$('tbtn');
 const openP=()=>{$('panel').classList.add('open');renderPanel()};
-tb.addEventListener('pointerdown',()=>{holdT=setTimeout(openP,800)});
-['pointerup','pointerleave','pointercancel'].forEach(ev=>tb.addEventListener(ev,()=>clearTimeout(holdT)));
-tb.addEventListener('keydown',e=>{if(e.key==='Enter')openP()});
+$('tbtn').onclick=openP;
 $('pClose').onclick=()=>$('panel').classList.remove('open');
 function go(d){stopRec();const n=Math.max(0,Math.min(S.length-1,cur+d));if(n===cur)return;log('換頁',{到:S[n].key});cur=n;render();speak(speakText())}
 $('pPrev').onclick=()=>go(-1);$('pNext').onclick=()=>go(1);
@@ -326,7 +332,7 @@ function renderPanel(){
  if(s.key==='rec1'||s.key==='ask'){c=`<h4>錄音一有說到的要素（播放錄音一後勾選）</h4><div class="row">${EL.map(e=>`<label class="ck"><input type="checkbox" data-el="${e.k}" ${marked[e.k]?'checked':''}>${e.k}</label>`).join('')}</div><div class="row" style="margin-top:8px"><button class="pri" id="sendAsk">送出追問卡</button></div>`}
  if(s.key==='rec2'||s.key==='listen'){c=`<h4>錄音二有說到的要素</h4><div class="row">${EL.map(e=>`<label class="ck"><input type="checkbox" data-el2="${e.k}" ${marked2[e.k]?'checked':''}>${e.k}</label>`).join('')}</div>`}
  $('pCtx').innerHTML=c;
- const sa=$('sendAsk');if(sa)sa.onclick=()=>{askList=EL.filter(e=>!marked[e.k]);askIdx=0;S.find(x=>x.key==='ask')._sent=true;log('送出追問卡',{錄音一有說到:EL.filter(e=>marked[e.k]).map(e=>e.k),追問:askList.map(e=>e.k)});cur=S.findIndex(x=>x.key==='ask');render();speak(speakText())};
+ const sa=$('sendAsk');if(sa)sa.onclick=()=>{askList=EL.filter(e=>!marked[e.k]);askIdx=0;S.find(x=>x.key==='ask')._sent=true;$('panel').classList.remove('open');log('送出追問卡',{錄音一有說到:EL.filter(e=>marked[e.k]).map(e=>e.k),追問:askList.map(e=>e.k)});cur=S.findIndex(x=>x.key==='ask');render();speak(speakText())};
  renderClips();renderLog()}
 $('pCtx').addEventListener('change',e=>{const t=e.target;if(t.dataset.el){marked[t.dataset.el]=t.checked;log('要素勾選（錄音一）',{要素:t.dataset.el,有說到:t.checked})}if(t.dataset.el2){marked2[t.dataset.el2]=t.checked;log('要素勾選（錄音二）',{要素:t.dataset.el2,有說到:t.checked})}});
 $('pCtx').addEventListener('click',e=>{const b=e.target.closest('[data-cm]');if(!b)return;const s=S[cur];choice[s.key+'_mark']=b.dataset.cm;log('老師標記',{心情卡:b.dataset.cm});renderPanel()});
