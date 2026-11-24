@@ -6,12 +6,13 @@
 <title>第 1 堂｜說一件事給家人聽</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fontsource/bpmf-iansui@5.3.1/index.css" rel="stylesheet">
 <style>
 /* 大吉學習站 第 1 堂：橫式 iPad，左邊情境、右邊目前這一步，老師控制換頁 */
 :root{color-scheme:light;--bg:#fbfaf7;--ink:#1f2430;--muted:#5b6170;--left:#e3eef7;--card:#fff;--line:#d5dbe3;--accent:#e8772e;--accent-d:#c45f1d;--ok:#2f7d5b;--help:#3a6fb0;--warn:#fff4e5}
 *{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:22px/1.5 "Noto Sans TC","PingFang TC","Heiti TC",sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
+body{margin:0;background:var(--bg);color:var(--ink);font:22px/1.5 "Bpmf Iansui","Noto Sans TC","PingFang TC","Heiti TC",sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
 button{font:inherit;color:inherit;border:0;cursor:pointer;border-radius:16px;min-height:56px;padding:10px 22px}
 button:focus-visible{outline:4px solid var(--help);outline-offset:2px}
 .app{display:grid;grid-template-rows:64px 1fr 96px;height:100vh;height:100dvh}
@@ -21,7 +22,7 @@ button:focus-visible{outline:4px solid var(--help);outline-offset:2px}
 .dots{display:flex;gap:6px}
 .dots i{width:12px;height:12px;border-radius:50%;background:var(--line)}
 .dots i.on{background:var(--accent)}.dots i.done{background:#9fb8cf}
-.tbtn{min-height:44px;font-size:17px;background:#eef1f5;color:var(--muted);padding:6px 16px}
+.tbtn{font-family:"Noto Sans TC","PingFang TC",sans-serif;min-height:44px;font-size:17px;background:#eef1f5;color:var(--muted);padding:6px 16px}
 .main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:0}
 .left{background:var(--left);padding:28px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:18px;overflow:auto;text-align:center}
 .right{padding:28px 32px;display:flex;flex-direction:column;gap:18px;overflow:auto}
@@ -64,7 +65,7 @@ button:focus-visible{outline:4px solid var(--help);outline-offset:2px}
 .banner{position:fixed;left:50%;top:76px;transform:translateX(-50%);background:var(--help);color:#fff;padding:12px 26px;border-radius:999px;font-size:20px;display:none;z-index:20}
 .err{color:#b3261e;font-size:18px}
 /* 教師面板 */
-.panel{position:fixed;inset:0 0 0 auto;width:min(460px,92vw);background:#fff;box-shadow:-8px 0 30px rgba(0,0,0,.18);transform:translateX(105%);transition:transform .2s;z-index:30;display:flex;flex-direction:column;font-size:18px}
+.panel{font-family:"Noto Sans TC","PingFang TC",sans-serif;position:fixed;inset:0 0 0 auto;width:min(460px,92vw);background:#fff;box-shadow:-8px 0 30px rgba(0,0,0,.18);transform:translateX(105%);transition:transform .2s;z-index:30;display:flex;flex-direction:column;font-size:18px}
 .panel.open{transform:none}
 @media(prefers-reduced-motion:reduce){.panel{transition:none}}
 .ph{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--line);font-weight:700}
@@ -80,7 +81,7 @@ button:focus-visible{outline:4px solid var(--help);outline-offset:2px}
 .pb label.ck input{width:22px;height:22px}
 .log{font-size:15px;color:var(--muted);max-height:160px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:6px 10px}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;place-items:center;z-index:40}
-.modal .box{background:#fff;border-radius:18px;padding:22px;max-width:420px;font-size:19px;display:grid;gap:14px}
+.modal .box{font-family:"Noto Sans TC","PingFang TC",sans-serif;background:#fff;border-radius:18px;padding:22px;max-width:420px;font-size:19px;display:grid;gap:14px}
 @media(max-width:820px){.main{grid-template-columns:minmax(0,1fr)}.left{padding:16px}.opts{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
@@ -171,9 +172,9 @@ const FEEL=Object.keys(FACES);
 
 /* ---------- 六要素 ---------- */
 const EL=[
- {k:'時間',q:'那時候是什麼時候？早上、中午，還是什麼時候？',i:'<circle cx="24" cy="24" r="19" fill="none" stroke="#1f2430" stroke-width="4"/><path d="M24 12v13l9 6" stroke="#1f2430" stroke-width="4" fill="none" stroke-linecap="round"/>'},
+ {k:'時間',q:'那時候是什麼時候？早上、中午，或是什麼時候？',i:'<circle cx="24" cy="24" r="19" fill="none" stroke="#1f2430" stroke-width="4"/><path d="M24 12v13l9 6" stroke="#1f2430" stroke-width="4" fill="none" stroke-linecap="round"/>'},
  {k:'地點',q:'那時候你在哪裡？',i:'<path d="M24 44s-14-14-14-24a14 14 0 0 1 28 0c0 10-14 24-14 24z" fill="#e8772e"/><circle cx="24" cy="20" r="5" fill="#fff"/>'},
- {k:'人物',q:'那時候有誰跟你在一起？還是你自己一個人？',i:'<circle cx="24" cy="15" r="8" fill="#3a6fb0"/><path d="M8 42c2-12 30-12 32 0z" fill="#3a6fb0"/>'},
+ {k:'人物',q:'那時候有誰跟你在一起？或是你自己一個人？',i:'<circle cx="24" cy="15" r="8" fill="#3a6fb0"/><path d="M8 42c2-12 30-12 32 0z" fill="#3a6fb0"/>'},
  {k:'經過',q:'發生了什麼事？你做了什麼？',i:'<path d="M8 24h26M26 14l10 10-10 10" stroke="#1f2430" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'},
  {k:'結果',q:'後來呢？事情最後怎麼了？',i:'<path d="M10 25l9 9 19-20" stroke="#2f7d5b" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'},
  {k:'感受',q:'那時候你覺得怎麼樣？為什麼？',i:'<path d="M24 42S6 30 6 18a9 9 0 0 1 18-3 9 9 0 0 1 18 3c0 12-18 24-18 24z" fill="#d64545"/>'}];
@@ -196,7 +197,7 @@ CARDS.forEach((c,i)=>S.push({key:'card'+(i+1),task:c.me?'心情卡：換成自�
 S.push({key:'think',task:'事件重述',sec:2,title:'說一件事給家人聽',speak:'想一件今天來上課之前發生的事。想好了，就按我做好了。'});
 S.push({key:'rec1',task:'事件重述',sec:2,title:'錄音一',speak:'把這件事說給家人聽。家人那時候沒有跟你在一起，所以要說清楚。按紅色按鈕開始錄音。'});
 S.push({key:'ask',task:'事件重述',sec:2,title:'家人想知道更多',speak:''});
-S.push({key:'rec2',task:'事件重述',sec:2,title:'錄音二',speak:'看著這六個提示，把整件事從頭再說一次。'});
+S.push({key:'rec2',task:'事件重述',sec:2,title:'錄音二',speak:'看這六個提示，把整件事從頭再說一次。'});
 S.push({key:'listen',task:'事件重述',sec:2,title:'聽聽看',speak:'聽聽看你的兩段錄音。哪一段比較清楚？為什麼？'});
 S.push({key:'write',task:'記事書寫',sec:3,title:'寫下來',speak:'拿出學習單，把剛剛說的事寫下來。'});
 S.push({key:'mood',task:'收尾',sec:4,title:'今天的心情',speak:'今天上完課，你覺得怎麼樣？為什麼？'});
@@ -223,7 +224,7 @@ function stopRec(){if(rec&&rec.state==='recording')rec.stop()}
 function recErr(m){const el=document.querySelector('.recmsg');if(el)el.textContent=m;log('錄音失敗',m)}
 function recBlock(key,label){const r=rec&&recKey&&recKey.key===key&&recKey.label===label;
  const mine=clips.filter(c=>c.key===key&&c.label===label);
- return `<div class="rec"><button class="recbtn ${r?'stop':''}" data-rec="${esc(key)}" data-label="${esc(label)}"><span class="dot"></span>${r?'說完了，停止':(mine.length?'重新錄一次':'開始錄音')}</button>
+ return `<div class="rec"><button class="recbtn ${r?'stop':''}" data-rec="${esc(key)}" data-label="${esc(label)}"><span class="dot"></span>${r?'說完了，停止':(mine.length?'再錄一次':'開始錄音')}</button>
  ${mine.length?`<div class="clip"><span>已經錄好了</span><button data-play="${mine[mine.length-1].url}">聽一聽</button></div>`:''}<div class="recmsg err"></div></div>`}
 let player=null;function play(url){try{if(player)player.pause();player=new Audio(url);player.play().catch(()=>{})}catch(e){}}
 
@@ -240,12 +241,12 @@ function render(){
  let L='',R='';
  if(s.key==='flow'){
   L=`<ul class="list">${SECS.slice(1,4).map((t,i)=>`<li><b>${i+1}</b>${t}</li>`).join('')}</ul>`;
-  R=`<div class="q">今天要做三件事</div><div class="sub">做完一件，左邊就會打勾。</div><div class="q" style="font-size:26px">想跟老師說事情的時候，可以先問：</div><div class="say">「老師，我可以跟你說一件事嗎？」</div><div class="sub">試著說一次，說好了按「我做好了」。</div>`}
+  R=`<div class="q">今天要做三件事</div><div class="sub">做完一件，左邊就會打勾。</div><div class="q" style="font-size:26px">想跟老師說事情的時候，可以先問：</div><div class="say">「老師，我可以跟你說一件事嗎？」</div><div class="sub">試試看，說一次，說好了按「我做好了」。</div>`}
  else if(s.card){const c=s.card;
   L=`${face(c.ans)}<div class="scene">${esc(c.scene)}</div>`;
   const q=c.me?'如果是你，你會覺得怎麼樣？':`${esc(c.who)}看起來怎麼樣？`;
-  R=`<div class="q">${q}</div><div class="say">先用說的：「${c.me?'我會覺得':'他看起來'}＿＿＿，因為＿＿＿。」</div>`;
-  if(shown[s.key]){const opts=shown[s.key];R+=`<div class="opts">${opts.map(o=>`<button class="opt ${choice[s.key]===o?'sel':''}" data-opt="${o}">${o}</button>`).join('')}</div><div class="sub">選好之後，再用說的補上「因為＿＿＿」。</div>`}
+  R=`<div class="q">${q}</div><div class="say">先用說的：「${c.me?'我會覺得':'他看起來'}（　　），因為（　　）。」</div>`;
+  if(shown[s.key]){const opts=shown[s.key];R+=`<div class="opts">${opts.map(o=>`<button class="opt ${choice[s.key]===o?'sel':''}" data-opt="${o}">${o}</button>`).join('')}</div><div class="sub">選好之後，再用說的補上「因為（　　）」。</div>`}
   else R+=`<button class="reveal" data-reveal="1">我需要選項</button>`}
  else if(s.key==='think'){
   L=`<svg viewBox="0 0 300 200" style="width:min(380px,90%)" aria-hidden="true"><rect x="20" y="70" width="110" height="100" rx="8" fill="#fff" stroke="#1f2430" stroke-width="4"/><path d="M10 78 L75 26 L140 78" fill="#e8772e" stroke="#1f2430" stroke-width="4" stroke-linejoin="round"/><rect x="62" y="118" width="28" height="52" fill="#9fb8cf"/><path d="M150 140 h60" stroke="#1f2430" stroke-width="5" stroke-dasharray="10 10"/><path d="M206 128 l14 12 -14 12" stroke="#1f2430" stroke-width="5" fill="none"/><rect x="230" y="60" width="60" height="110" rx="6" fill="#fff" stroke="#1f2430" stroke-width="4"/><rect x="242" y="76" width="36" height="24" fill="#dcecf7"/><rect x="242" y="112" width="36" height="24" fill="#dcecf7"/></svg><div class="scene">今天來上課之前</div>`;
@@ -261,19 +262,19 @@ function render(){
    R=`<div class="card"><div class="sub">家人想知道：</div><div class="q">${e.q}</div></div>${recBlock('ask','追問：'+e.k)}${askIdx<askList.length-1?`<button class="reveal" data-nextask="1">下一張</button>`:''}`}}
  else if(s.key==='rec2'){
   L=`<div class="icons">${EL.map(e=>`<div>${elIcon(e)}${e.k}</div>`).join('')}</div>`;
-  R=`<div class="q">看著左邊六個提示，把整件事從頭再說一次。</div>${recBlock('rec2','錄音二')}`}
+  R=`<div class="q">看左邊的六個提示，把整件事從頭再說一次。</div>${recBlock('rec2','錄音二')}`}
  else if(s.key==='listen'){
   const a=clips.filter(c=>c.label==='錄音一').pop(),b=clips.filter(c=>c.label==='錄音二').pop();
   L=`<div class="clips" style="max-width:420px">${a?`<div class="clip"><span style="flex:1">第一段</span><button data-play="${a.url}">聽一聽</button></div>`:''}${b?`<div class="clip"><span style="flex:1">第二段</span><button data-play="${b.url}">聽一聽</button></div>`:''}${!a&&!b?'<div class="scene">沒有找到錄音</div>':''}</div>`;
   const o=['第一段','第二段','差不多'];
-  R=`<div class="q">哪一段比較清楚？</div><div class="opts">${o.map(x=>`<button class="opt ${choice.listen===x?'sel':''}" data-opt="${x}">${x}</button>`).join('')}</div><div class="say">說說看：「因為＿＿＿。」</div>`}
+  R=`<div class="q">哪一段比較清楚？</div><div class="opts">${o.map(x=>`<button class="opt ${choice.listen===x?'sel':''}" data-opt="${x}">${x}</button>`).join('')}</div><div class="say">說說看：「因為（　　）。」</div>`}
  else if(s.key==='write'){
   L=`<div class="icons">${EL.map(e=>`<div>${elIcon(e)}${e.k}</div>`).join('')}</div>`;
   R=`<div class="q">拿出學習單，把剛剛說的事寫下來。</div><div class="sub">可以看左邊的提示，也可以請老師再放一次你的錄音。</div><div class="sub">寫完了，檢查一次，再按「我做好了」。</div>`}
  else if(s.key==='mood'){
   if(!shown.mood)shown.mood=shuffle(FEEL);
   L=`<div class="scene">今天上完課</div>`;
-  R=`<div class="q">你現在覺得怎麼樣？</div><div class="opts">${shown.mood.map(o=>`<button class="opt ${choice.mood===o?'sel':''}" data-opt="${o}">${o}</button>`).join('')}</div><div class="say">說說看：「我覺得＿＿＿，因為＿＿＿。」</div>`}
+  R=`<div class="q">你現在覺得怎麼樣？</div><div class="opts">${shown.mood.map(o=>`<button class="opt ${choice.mood===o?'sel':''}" data-opt="${o}">${o}</button>`).join('')}</div><div class="say">說說看：「我覺得（　　），因為（　　）。」</div>`}
  else if(s.key==='bye'){
   L=`<svg viewBox="0 0 200 160" style="width:min(260px,70%)" aria-hidden="true"><circle cx="100" cy="80" r="62" fill="#fff" stroke="#1f2430" stroke-width="6"/><path d="M100 40v42l26 16" stroke="#1f2430" stroke-width="7" fill="none" stroke-linecap="round"/></svg><div class="scene">上課時間到了</div>`;
   R=`<div class="q">要怎麼跟老師說？</div><div class="say">先用說的。</div>`;
@@ -284,8 +285,12 @@ function render(){
   R=`<div class="q">今天的課完成了！</div><div class="sub">謝謝${esc(NAME)}。</div>`}
  $('left').innerHTML=L;$('right').innerHTML=R;
  if(s.key==='flow'){const lis=$('left').querySelectorAll('li');lis.forEach((li,i)=>{const sec=i+1;if(S.slice(0,cur).some(x=>x.sec===sec)&&!S.slice(cur).some(x=>x.sec===sec)){li.classList.add('ok');li.querySelector('b').textContent='✓'}})}
+ ['left','right','title','wait'].forEach(id=>bpFix($(id)));
  renderPanel()}
 
+/* ---------- 注音破音字修正（Bpmf Iansui 的 IVS） ---------- */
+const BP=[['覺得','覺得\u{E01E3}'],['還想','還\u{E01E2}想']];
+function bpFix(root){if(!root)return;const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){let t=n.nodeValue,o=t;for(const [a,b] of BP)t=t.split(a).join(b);if(t!==o)n.nodeValue=t}}
 /* ---------- 學生操作 ---------- */
 document.addEventListener('click',e=>{
  const t=e.target.closest('button');if(!t)return;const s=S[cur];
@@ -299,7 +304,7 @@ document.addEventListener('click',e=>{
  if(t.dataset.nextask){askIdx=Math.min(askIdx+1,askList.length-1);render();speak(speakText());return}
 });
 $('bDone').onclick=()=>{doneFlag[cur]=true;log('我做好了',{});render()};
-$('bHelp').onclick=()=>{log('我需要幫忙',{});const b=$('banner');b.textContent='老師知道了，等一下喔。';b.style.display='block';setTimeout(()=>b.style.display='none',2500)};
+$('bHelp').onclick=()=>{log('我需要幫忙',{});const b=$('banner');b.textContent='老師知道了，等一下喔。';bpFix(b);b.style.display='block';setTimeout(()=>b.style.display='none',2500)};
 $('bAgain').onclick=()=>{log('再聽一次',{});speak(speakText())};
 
 /* ---------- 教師面板 ---------- */
