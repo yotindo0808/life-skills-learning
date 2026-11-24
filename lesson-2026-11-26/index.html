@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>第 1 堂｜說一件事給家人聽</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* 大吉學習站 第 1 堂：橫式 iPad，左邊情境、右邊目前這一步，老師控制換頁 */
+:root{color-scheme:light;--bg:#fbfaf7;--ink:#1f2430;--muted:#5b6170;--left:#e3eef7;--card:#fff;--line:#d5dbe3;--accent:#e8772e;--accent-d:#c45f1d;--ok:#2f7d5b;--help:#3a6fb0;--warn:#fff4e5}
+*{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:22px/1.5 "Noto Sans TC","PingFang TC","Heiti TC",sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
+button{font:inherit;color:inherit;border:0;cursor:pointer;border-radius:16px;min-height:56px;padding:10px 22px}
+button:focus-visible{outline:4px solid var(--help);outline-offset:2px}
+.app{display:grid;grid-template-rows:64px 1fr 96px;height:100vh;height:100dvh}
+.top{display:flex;align-items:center;gap:16px;padding:0 20px;border-bottom:1px solid var(--line);background:#fff}
+.tag{font-size:16px;background:var(--warn);color:#8a4b10;padding:4px 12px;border-radius:999px}
+.title{font-weight:700;font-size:22px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dots{display:flex;gap:6px}
+.dots i{width:12px;height:12px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--accent)}.dots i.done{background:#9fb8cf}
+.tbtn{min-height:44px;font-size:17px;background:#eef1f5;color:var(--muted);padding:6px 16px}
+.main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:0}
+.left{background:var(--left);padding:28px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:18px;overflow:auto;text-align:center}
+.right{padding:28px 32px;display:flex;flex-direction:column;gap:18px;overflow:auto}
+.q{font-size:30px;font-weight:700;line-height:1.35}
+.sub{color:var(--muted);font-size:20px}
+.say{background:#fff;border:2px dashed var(--line);border-radius:16px;padding:14px 18px;font-size:24px}
+.bottom{display:flex;gap:16px;align-items:center;padding:0 24px;border-top:1px solid var(--line);background:#fff}
+.big{font-size:24px;font-weight:700;min-height:68px;padding:0 30px}
+.done{background:var(--accent);color:#fff}.done:active{background:var(--accent-d)}
+.helpb{background:#e7effa;color:var(--help)}
+.again{background:#eef1f5}
+.spacer{flex:1}
+.wait{font-size:20px;color:var(--ok);font-weight:500}
+.opts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.opts.two{grid-template-columns:minmax(0,1fr)}
+.opt{background:#fff;border:2px solid var(--line);font-size:24px;min-height:64px}
+.opt.sel{border-color:var(--accent);background:#fff3ea;font-weight:700}
+.reveal{background:#eef1f5;font-size:20px;align-self:flex-start}
+.list{list-style:none;margin:0;padding:0;display:grid;gap:14px;width:100%;max-width:440px;text-align:left}
+.list li{background:#fff;border-radius:16px;padding:14px 18px;display:flex;gap:14px;align-items:center;font-size:24px}
+.list li b{width:36px;height:36px;border-radius:50%;border:3px solid var(--line);flex:none;display:grid;place-items:center;font-size:20px}
+.list li.ok b{background:var(--ok);border-color:var(--ok);color:#fff}
+.scene{font-size:26px;font-weight:500;background:#fff;border-radius:16px;padding:14px 20px;max-width:440px}
+.face{width:min(260px,32vh);height:min(260px,32vh)}
+.rec{display:flex;flex-direction:column;gap:14px;align-items:flex-start}
+.recbtn{background:#d64545;color:#fff;font-size:26px;font-weight:700;min-height:80px;padding:0 36px;display:flex;align-items:center;gap:14px}
+.recbtn.stop{background:#444}
+.recbtn .dot{width:22px;height:22px;border-radius:50%;background:#fff}
+.recbtn.stop .dot{border-radius:4px;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.3}}
+@media(prefers-reduced-motion:reduce){.recbtn.stop .dot{animation:none}}
+.clips{display:grid;gap:8px;width:100%}
+.clip{display:flex;align-items:center;gap:12px;background:#fff;border-radius:14px;padding:8px 14px;font-size:19px}
+.clip button{min-height:48px;font-size:19px;background:#eef1f5;padding:6px 16px}
+.icons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;width:100%;max-width:460px}
+.icons div{background:#fff;border-radius:16px;padding:12px 6px;font-size:22px;font-weight:500;display:grid;gap:4px;justify-items:center}
+.icons svg{width:46px;height:46px}
+.icons div.miss{outline:3px solid var(--accent)}
+.card{background:#fff;border-radius:18px;padding:20px 22px;border:2px solid var(--line)}
+.banner{position:fixed;left:50%;top:76px;transform:translateX(-50%);background:var(--help);color:#fff;padding:12px 26px;border-radius:999px;font-size:20px;display:none;z-index:20}
+.err{color:#b3261e;font-size:18px}
+/* 教師面板 */
+.panel{position:fixed;inset:0 0 0 auto;width:min(460px,92vw);background:#fff;box-shadow:-8px 0 30px rgba(0,0,0,.18);transform:translateX(105%);transition:transform .2s;z-index:30;display:flex;flex-direction:column;font-size:18px}
+.panel.open{transform:none}
+@media(prefers-reduced-motion:reduce){.panel{transition:none}}
+.ph{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--line);font-weight:700}
+.pb{padding:14px 18px;overflow:auto;display:grid;gap:16px;align-content:start;-webkit-user-select:text;user-select:text}
+.pb h4{margin:0 0 6px;font-size:17px;color:var(--muted)}
+.pb button{min-height:44px;font-size:17px;background:#eef1f5;padding:6px 14px}
+.pb .pri{background:var(--accent);color:#fff}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg button.on{background:var(--ink);color:#fff}
+.pb input[type=text],.pb textarea{font:inherit;font-size:16px;width:100%;border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.pb textarea{min-height:80px}
+.pb label.ck{display:flex;gap:8px;align-items:center;min-height:40px;padding:0 10px;border:1px solid var(--line);border-radius:10px}
+.pb label.ck input{width:22px;height:22px}
+.log{font-size:15px;color:var(--muted);max-height:160px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:6px 10px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;place-items:center;z-index:40}
+.modal .box{background:#fff;border-radius:18px;padding:22px;max-width:420px;font-size:19px;display:grid;gap:14px}
+@media(max-width:820px){.main{grid-template-columns:minmax(0,1fr)}.left{padding:16px}.opts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <span class="tag">練習用</span>
+    <div class="title" id="title"></div>
+    <div class="dots" id="dots"></div>
+    <button class="tbtn" id="tbtn" aria-label="老師（按住一秒）">老師</button>
+  </header>
+  <main class="main">
+    <section class="left" id="left"></section>
+    <section class="right" id="right"></section>
+  </main>
+  <footer class="bottom">
+    <button class="big again" id="bAgain">再聽一次</button>
+    <button class="big helpb" id="bHelp">我需要幫忙</button>
+    <span class="spacer"></span>
+    <span class="wait" id="wait"></span>
+    <button class="big done" id="bDone">我做好了</button>
+  </footer>
+</div>
+<div class="banner" id="banner"></div>
+
+<aside class="panel" id="panel" aria-label="教師面板">
+  <div class="ph"><span>教師面板</span><button class="tbtn" id="pClose">關閉</button></div>
+  <div class="pb">
+    <div class="row"><button id="pPrev">上一步</button><button class="pri" id="pNext">下一步</button><span id="pStep"></span></div>
+    <div id="pCtx"></div>
+    <div>
+      <h4>這個任務的提示程度</h4>
+      <div class="row seg" id="pLevel"></div>
+    </div>
+    <div>
+      <h4>備註（只存在匯出檔，重新整理會消失）</h4>
+      <textarea id="pNote"></textarea>
+    </div>
+    <div>
+      <h4>錄音</h4>
+      <div class="clips" id="pClips"></div>
+    </div>
+    <div>
+      <h4>本堂紀錄</h4>
+      <div class="log" id="pLog"></div>
+    </div>
+    <div>
+      <h4>角色名稱</h4>
+      <div class="row"><input type="text" id="pName" style="flex:1"><button id="pNameSave">儲存</button></div>
+    </div>
+    <div class="row"><button class="pri" id="pExport">匯出紀錄</button><button id="pClear">清除 iPad 上的紀錄</button></div>
+  </div>
+</aside>
+<div class="modal" id="modal"><div class="box"><div id="mText"></div><div class="row"><button id="mNo">取消</button><button class="pri" id="mYes" style="background:#b3261e;color:#fff">確定清除</button></div></div></div>
+
+<script>
+{
+const LESSON='lesson01';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const now=()=>{const d=new Date(),z=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())} ${z(d.getHours())}:${z(d.getMinutes())}:${z(d.getSeconds())}`};
+
+/* ---------- 儲存：只存在這台 iPad（IndexedDB），失敗時只放記憶體 ---------- */
+let db=null;const mem={events:[],audio:[]};
+function openDB(){return new Promise(res=>{try{const r=indexedDB.open('daji-learning',1);r.onupgradeneeded=()=>{const d=r.result;if(!d.objectStoreNames.contains('events'))d.createObjectStore('events',{keyPath:'id',autoIncrement:true});if(!d.objectStoreNames.contains('audio'))d.createObjectStore('audio',{keyPath:'id',autoIncrement:true})};r.onsuccess=()=>{db=r.result;res()};r.onerror=()=>res()}catch(e){res()}})}
+function put(store,obj){return new Promise(res=>{if(!db){obj.id=mem[store].length+1;mem[store].push(obj);return res(obj.id)}try{const t=db.transaction(store,'readwrite');const q=t.objectStore(store).add(obj);q.onsuccess=()=>res(q.result);q.onerror=()=>{mem[store].push(obj);res(null)}}catch(e){mem[store].push(obj);res(null)}})}
+function all(store){return new Promise(res=>{if(!db)return res(mem[store].slice());try{const q=db.transaction(store).objectStore(store).getAll();q.onsuccess=()=>res(q.result.concat(mem[store]));q.onerror=()=>res(mem[store].slice())}catch(e){res(mem[store].slice())}})}
+function clearAll(){mem.events=[];mem.audio=[];return new Promise(res=>{if(!db)return res();try{const t=db.transaction(['events','audio'],'readwrite');t.objectStore('events').clear();t.objectStore('audio').clear();t.oncomplete=()=>res();t.onerror=()=>res()}catch(e){res()}})}
+const lsGet=(k,d)=>{try{return localStorage.getItem(k)??d}catch(e){return d}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+
+let NAME=lsGet('daji-name','大吉');
+const notes={};const levels={};
+function log(type,data){const e={lesson:LESSON,ts:now(),step:S[cur].key,task:S[cur].task,type,data};put('events',e);renderLog()}
+
+/* ---------- 心情臉 ---------- */
+const FACES={
+ 開心:{b:'M70 92 Q85 84 100 92 M140 92 Q155 84 170 92',m:'M80 150 Q120 190 160 150',c:'#ffd76a'},
+ 難過:{b:'M72 86 Q86 94 100 98 M140 98 Q154 94 168 86',m:'M84 172 Q120 140 156 172',c:'#bcd3f0'},
+ 生氣:{b:'M70 84 L102 100 M138 100 L170 84',m:'M86 168 Q120 150 154 168',c:'#f4a38c'},
+ 害怕:{b:'M70 96 Q86 80 102 90 M138 90 Q154 80 170 96',m:'M98 156 Q120 146 142 156 Q142 182 120 182 Q98 182 98 156Z',c:'#d9d2f0'},
+ 緊張:{b:'M72 92 L100 86 M140 86 L168 92',m:'M86 162 L98 154 L110 162 L122 154 L134 162 L146 154 L156 162',c:'#cfe8d8'},
+ 驚訝:{b:'M70 80 Q86 68 102 78 M138 78 Q154 68 170 80',m:'M106 150 Q120 132 134 150 Q134 176 120 176 Q106 176 106 150Z',c:'#ffe3b3'}};
+function face(k){const f=FACES[k];const big=(k==='驚訝'||k==='害怕')?14:11;
+ return `<svg class="face" viewBox="0 0 240 240" role="img" aria-label="人物的表情"><circle cx="120" cy="124" r="100" fill="${f.c}" stroke="#1f2430" stroke-width="5"/><circle cx="88" cy="118" r="${big}" fill="#1f2430"/><circle cx="152" cy="118" r="${big}" fill="#1f2430"/><path d="${f.b}" stroke="#1f2430" stroke-width="7" stroke-linecap="round" fill="none"/><path d="${f.m}" stroke="#1f2430" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="${k==='害怕'||k==='驚訝'?'#1f2430':'none'}"/>${k==='緊張'?'<path d="M186 70 q8 14 0 22 q-8 -8 0 -22z" fill="#6fb3e0"/>':''}</svg>`}
+const FEEL=Object.keys(FACES);
+
+/* ---------- 六要素 ---------- */
+const EL=[
+ {k:'時間',q:'那時候是什麼時候？早上、中午，還是什麼時候？',i:'<circle cx="24" cy="24" r="19" fill="none" stroke="#1f2430" stroke-width="4"/><path d="M24 12v13l9 6" stroke="#1f2430" stroke-width="4" fill="none" stroke-linecap="round"/>'},
+ {k:'地點',q:'那時候你在哪裡？',i:'<path d="M24 44s-14-14-14-24a14 14 0 0 1 28 0c0 10-14 24-14 24z" fill="#e8772e"/><circle cx="24" cy="20" r="5" fill="#fff"/>'},
+ {k:'人物',q:'那時候有誰跟你在一起？還是你自己一個人？',i:'<circle cx="24" cy="15" r="8" fill="#3a6fb0"/><path d="M8 42c2-12 30-12 32 0z" fill="#3a6fb0"/>'},
+ {k:'經過',q:'發生了什麼事？你做了什麼？',i:'<path d="M8 24h26M26 14l10 10-10 10" stroke="#1f2430" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'},
+ {k:'結果',q:'後來呢？事情最後怎麼了？',i:'<path d="M10 25l9 9 19-20" stroke="#2f7d5b" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'},
+ {k:'感受',q:'那時候你覺得怎麼樣？為什麼？',i:'<path d="M24 42S6 30 6 18a9 9 0 0 1 18-3 9 9 0 0 1 18 3c0 12-18 24-18 24z" fill="#d64545"/>'}];
+const elIcon=e=>`<svg viewBox="0 0 48 48" aria-hidden="true">${e.i}</svg>`;
+let marked={};      /* 老師勾選：錄音一有說到 */
+let askList=[];let askIdx=0;
+let marked2={};     /* 錄音二有說到 */
+
+/* ---------- 步驟 ---------- */
+const CARDS=[
+ {who:'小安',scene:'小安拿到一份生日禮物。',ans:'開心',me:false},
+ {who:'阿哲',scene:'排隊的時候，有人插隊到阿哲前面。',ans:'生氣',me:false},
+ {who:'小美',scene:'小美最喜歡的杯子掉到地上，破掉了。',ans:'難過',me:false},
+ {who:'志明',scene:'志明打開門，朋友們都在裡面等他。',ans:'驚訝',me:false},
+ {who:'你',scene:'等一下要上台，在大家面前說話。',ans:'緊張',me:true},
+ {who:'你',scene:'走在路上，一隻大狗突然對你大聲叫。',ans:'害怕',me:true}];
+const S=[];
+S.push({key:'flow',task:'開場',sec:0,title:'今天要做的事',speak:'今天要做三件事。第一，認識心情。第二，說一件事給家人聽。第三，把它寫下來。想跟老師說事情的時候，可以先問：老師，我可以跟你說一件事嗎？'});
+CARDS.forEach((c,i)=>S.push({key:'card'+(i+1),task:c.me?'心情卡：換成自己':'心情卡：看別人',sec:1,title:`認識心情 ${i+1}／6`,card:c}));
+S.push({key:'think',task:'事件重述',sec:2,title:'說一件事給家人聽',speak:'想一件今天來上課之前發生的事。想好了，就按我做好了。'});
+S.push({key:'rec1',task:'事件重述',sec:2,title:'錄音一',speak:'把這件事說給家人聽。家人那時候沒有跟你在一起，所以要說清楚。按紅色按鈕開始錄音。'});
+S.push({key:'ask',task:'事件重述',sec:2,title:'家人想知道更多',speak:''});
+S.push({key:'rec2',task:'事件重述',sec:2,title:'錄音二',speak:'看著這六個提示，把整件事從頭再說一次。'});
+S.push({key:'listen',task:'事件重述',sec:2,title:'聽聽看',speak:'聽聽看你的兩段錄音。哪一段比較清楚？為什麼？'});
+S.push({key:'write',task:'記事書寫',sec:3,title:'寫下來',speak:'拿出學習單，把剛剛說的事寫下來。'});
+S.push({key:'mood',task:'收尾',sec:4,title:'今天的心情',speak:'今天上完課，你覺得怎麼樣？為什麼？'});
+S.push({key:'bye',task:'結束話題',sec:4,title:'下課了',speak:'上課時間到了，你要怎麼跟老師說？'});
+S.push({key:'end',task:'收尾',sec:4,title:'完成了',speak:'今天的課完成了，謝謝你！'});
+const SECS=['開場','認識心情','說一件事給家人聽','寫下來','收尾'];
+
+let cur=0;const doneFlag={};const choice={};const shown={};
+
+/* ---------- 錄音 ---------- */
+let rec=null,chunks=[],stream=null,recKey=null;
+const clips=[];   /* {key,label,url,id} 本次上課 */
+async function startRec(key,label){
+ if(!navigator.mediaDevices||!window.MediaRecorder){return recErr('這個瀏覽器不能錄音。請用 iPad 的 Safari，並從 https 網址打開。')}
+ try{stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){return recErr('沒有取得麥克風權限。請在 Safari 允許使用麥克風。')}
+ chunks=[];recKey={key,label};
+ try{rec=new MediaRecorder(stream)}catch(e){return recErr('無法開始錄音。')}
+ rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+ rec.onstop=async()=>{const type=rec.mimeType||(chunks[0]&&chunks[0].type)||'audio/mp4';const blob=new Blob(chunks,{type});stream.getTracks().forEach(t=>t.stop());
+  const meta={lesson:LESSON,ts:now(),step:recKey.key,label:recKey.label,mime:type,blob};const id=await put('audio',meta);
+  clips.push({key:recKey.key,label:recKey.label,url:URL.createObjectURL(blob),id});log('錄音',{label:recKey.label,秒數:Math.round((Date.now()-t0)/1000)});rec=null;render();renderClips()};
+ const t0=Date.now();rec.start();render()}
+function stopRec(){if(rec&&rec.state==='recording')rec.stop()}
+function recErr(m){const el=document.querySelector('.recmsg');if(el)el.textContent=m;log('錄音失敗',m)}
+function recBlock(key,label){const r=rec&&recKey&&recKey.key===key&&recKey.label===label;
+ const mine=clips.filter(c=>c.key===key&&c.label===label);
+ return `<div class="rec"><button class="recbtn ${r?'stop':''}" data-rec="${esc(key)}" data-label="${esc(label)}"><span class="dot"></span>${r?'說完了，停止':(mine.length?'重新錄一次':'開始錄音')}</button>
+ ${mine.length?`<div class="clip"><span>已經錄好了</span><button data-play="${mine[mine.length-1].url}">聽一聽</button></div>`:''}<div class="recmsg err"></div></div>`}
+let player=null;function play(url){try{if(player)player.pause();player=new Audio(url);player.play().catch(()=>{})}catch(e){}}
+
+/* ---------- 說話 ---------- */
+function speak(t){if(!t||!window.speechSynthesis)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='zh-TW';u.rate=.9;const v=speechSynthesis.getVoices().find(v=>/zh[-_]TW/i.test(v.lang));if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}}
+function speakText(){const s=S[cur];if(s.card){const c=s.card;return c.me?`${c.scene}如果是你，你會覺得怎麼樣？為什麼？`:`${c.scene}${c.who}看起來怎麼樣？為什麼？`}
+ if(s.key==='ask'){const e=askList[askIdx];return e?`家人想知道：${e.q}`:'你說得很完整，家人都聽懂了。'}return s.speak}
+
+/* ---------- 畫面 ---------- */
+function render(){
+ const s=S[cur];$('title').textContent=s.title;
+ $('dots').innerHTML=S.map((x,i)=>`<i class="${i===cur?'on':i<cur?'done':''}"></i>`).join('');
+ $('wait').textContent=doneFlag[cur]?'做好了，等老師看一下':'';
+ let L='',R='';
+ if(s.key==='flow'){
+  L=`<ul class="list">${SECS.slice(1,4).map((t,i)=>`<li><b>${i+1}</b>${t}</li>`).join('')}</ul>`;
+  R=`<div class="q">今天要做三件事</div><div class="sub">做完一件，左邊就會打勾。</div><div class="q" style="font-size:26px">想跟老師說事情的時候，可以先問：</div><div class="say">「老師，我可以跟你說一件事嗎？」</div><div class="sub">試著說一次，說好了按「我做好了」。</div>`}
+ else if(s.card){const c=s.card;
+  L=`${face(c.ans)}<div class="scene">${esc(c.scene)}</div>`;
+  const q=c.me?'如果是你，你會覺得怎麼樣？':`${esc(c.who)}看起來怎麼樣？`;
+  R=`<div class="q">${q}</div><div class="say">先用說的：「${c.me?'我會覺得':'他看起來'}＿＿＿，因為＿＿＿。」</div>`;
+  if(shown[s.key]){const opts=shown[s.key];R+=`<div class="opts">${opts.map(o=>`<button class="opt ${choice[s.key]===o?'sel':''}" data-opt="${o}">${o}</button>`).join('')}</div><div class="sub">選好之後，再用說的補上「因為＿＿＿」。</div>`}
+  else R+=`<button class="reveal" data-reveal="1">我需要選項</button>`}
+ else if(s.key==='think'){
+  L=`<svg viewBox="0 0 300 200" style="width:min(380px,90%)" aria-hidden="true"><rect x="20" y="70" width="110" height="100" rx="8" fill="#fff" stroke="#1f2430" stroke-width="4"/><path d="M10 78 L75 26 L140 78" fill="#e8772e" stroke="#1f2430" stroke-width="4" stroke-linejoin="round"/><rect x="62" y="118" width="28" height="52" fill="#9fb8cf"/><path d="M150 140 h60" stroke="#1f2430" stroke-width="5" stroke-dasharray="10 10"/><path d="M206 128 l14 12 -14 12" stroke="#1f2430" stroke-width="5" fill="none"/><rect x="230" y="60" width="60" height="110" rx="6" fill="#fff" stroke="#1f2430" stroke-width="4"/><rect x="242" y="76" width="36" height="24" fill="#dcecf7"/><rect x="242" y="112" width="36" height="24" fill="#dcecf7"/></svg><div class="scene">今天來上課之前</div>`;
+  R=`<div class="q">想一件今天來上課之前發生的事。</div><div class="sub">可以是早餐、上學路上，或在學校的事。</div><div class="sub">想好了，按「我做好了」。</div>`}
+ else if(s.key==='rec1'){
+  L=`<svg viewBox="0 0 200 200" style="width:min(240px,60%)" aria-hidden="true"><circle cx="100" cy="70" r="36" fill="#3a6fb0"/><path d="M36 180c6-50 122-50 128 0z" fill="#3a6fb0"/><path d="M150 40c14 10 14 40 0 50M164 28c22 18 22 56 0 74" stroke="#e8772e" stroke-width="7" fill="none" stroke-linecap="round"/></svg><div class="scene">聽的人：家人<br>（那時候沒有跟你在一起）</div>`;
+  R=`<div class="q">把這件事說給家人聽。</div><div class="sub">家人那時候不在，所以要說清楚，讓他聽得懂。</div>${recBlock('rec1','錄音一')}`}
+ else if(s.key==='ask'){
+  if(!askList.length&&!s._sent){L=`<div class="scene">老師正在聽你的錄音……</div>`;R=`<div class="q">請等一下，老師在聽。</div>`}
+  else if(!askList.length){L=`<div class="scene">家人都聽懂了！</div>`;R=`<div class="q">你說得很完整。</div>`}
+  else{const e=askList[askIdx];
+   L=`<div class="icons" style="grid-template-columns:minmax(0,1fr);max-width:220px"><div>${elIcon(e)}${e.k}</div></div><div class="sub">第 ${askIdx+1} 張，共 ${askList.length} 張</div>`;
+   R=`<div class="card"><div class="sub">家人想知道：</div><div class="q">${e.q}</div></div>${recBlock('ask','追問：'+e.k)}${askIdx<askList.length-1?`<button class="reveal" data-nextask="1">下一張</button>`:''}`}}
+ else if(s.key==='rec2'){
+  L=`<div class="icons">${EL.map(e=>`<div>${elIcon(e)}${e.k}</div>`).join('')}</div>`;
+  R=`<div class="q">看著左邊六個提示，把整件事從頭再說一次。</div>${recBlock('rec2','錄音二')}`}
+ else if(s.key==='listen'){
+  const a=clips.filter(c=>c.label==='錄音一').pop(),b=clips.filter(c=>c.label==='錄音二').pop();
+  L=`<div class="clips" style="max-width:420px">${a?`<div class="clip"><span style="flex:1">第一段</span><button data-play="${a.url}">聽一聽</button></div>`:''}${b?`<div class="clip"><span style="flex:1">第二段</span><button data-play="${b.url}">聽一聽</button></div>`:''}${!a&&!b?'<div class="scene">沒有找到錄音</div>':''}</div>`;
+  const o=['第一段','第二段','差不多'];
+  R=`<div class="q">哪一段比較清楚？</div><div class="opts">${o.map(x=>`<button class="opt ${choice.listen===x?'sel':''}" data-opt="${x}">${x}</button>`).join('')}</div><div class="say">說說看：「因為＿＿＿。」</div>`}
+ else if(s.key==='write'){
+  L=`<div class="icons">${EL.map(e=>`<div>${elIcon(e)}${e.k}</div>`).join('')}</div>`;
+  R=`<div class="q">拿出學習單，把剛剛說的事寫下來。</div><div class="sub">可以看左邊的提示，也可以請老師再放一次你的錄音。</div><div class="sub">寫完了，檢查一次，再按「我做好了」。</div>`}
+ else if(s.key==='mood'){
+  if(!shown.mood)shown.mood=shuffle(FEEL);
+  L=`<div class="scene">今天上完課</div>`;
+  R=`<div class="q">你現在覺得怎麼樣？</div><div class="opts">${shown.mood.map(o=>`<button class="opt ${choice.mood===o?'sel':''}" data-opt="${o}">${o}</button>`).join('')}</div><div class="say">說說看：「我覺得＿＿＿，因為＿＿＿。」</div>`}
+ else if(s.key==='bye'){
+  L=`<svg viewBox="0 0 200 160" style="width:min(260px,70%)" aria-hidden="true"><circle cx="100" cy="80" r="62" fill="#fff" stroke="#1f2430" stroke-width="6"/><path d="M100 40v42l26 16" stroke="#1f2430" stroke-width="7" fill="none" stroke-linecap="round"/></svg><div class="scene">上課時間到了</div>`;
+  R=`<div class="q">要怎麼跟老師說？</div><div class="say">先用說的。</div>`;
+  if(shown.bye)R+=`<div class="opts two">${shown.bye.map(o=>`<button class="opt ${choice.bye===o?'sel':''}" data-opt="${esc(o)}">${esc(o)}</button>`).join('')}</div>`;
+  else R+=`<button class="reveal" data-reveal="1">我需要選項</button>`}
+ else if(s.key==='end'){
+  L=`<ul class="list">${SECS.slice(1,4).map((t,i)=>`<li class="ok"><b>✓</b>${t}</li>`).join('')}</ul>`;
+  R=`<div class="q">今天的課完成了！</div><div class="sub">謝謝${esc(NAME)}。</div>`}
+ $('left').innerHTML=L;$('right').innerHTML=R;
+ if(s.key==='flow'){const lis=$('left').querySelectorAll('li');lis.forEach((li,i)=>{const sec=i+1;if(S.slice(0,cur).some(x=>x.sec===sec)&&!S.slice(cur).some(x=>x.sec===sec)){li.classList.add('ok');li.querySelector('b').textContent='✓'}})}
+ renderPanel()}
+
+/* ---------- 學生操作 ---------- */
+document.addEventListener('click',e=>{
+ const t=e.target.closest('button');if(!t)return;const s=S[cur];
+ if(t.dataset.rec!==undefined){if(rec&&rec.state==='recording')stopRec();else startRec(t.dataset.rec,t.dataset.label);return}
+ if(t.dataset.play){play(t.dataset.play);return}
+ if(t.dataset.reveal){
+  if(s.card)shown[s.key]=shuffle(FEEL);
+  if(s.key==='bye')shown.bye=shuffle(['老師，今天上到這裡，謝謝老師，下次見。','（不說話，直接走掉。）','老師，我還想跟你說另外一件事。']);
+  log('打開選項',{});render();return}
+ if(t.dataset.opt){choice[s.key]=t.dataset.opt;log('選擇',{選項:t.dataset.opt});render();return}
+ if(t.dataset.nextask){askIdx=Math.min(askIdx+1,askList.length-1);render();speak(speakText());return}
+});
+$('bDone').onclick=()=>{doneFlag[cur]=true;log('我做好了',{});render()};
+$('bHelp').onclick=()=>{log('我需要幫忙',{});const b=$('banner');b.textContent='老師知道了，等一下喔。';b.style.display='block';setTimeout(()=>b.style.display='none',2500)};
+$('bAgain').onclick=()=>{log('再聽一次',{});speak(speakText())};
+
+/* ---------- 教師面板 ---------- */
+let holdT=null;const tb=$('tbtn');
+const openP=()=>{$('panel').classList.add('open');renderPanel()};
+tb.addEventListener('pointerdown',()=>{holdT=setTimeout(openP,800)});
+['pointerup','pointerleave','pointercancel'].forEach(ev=>tb.addEventListener(ev,()=>clearTimeout(holdT)));
+tb.addEventListener('keydown',e=>{if(e.key==='Enter')openP()});
+$('pClose').onclick=()=>$('panel').classList.remove('open');
+function go(d){stopRec();const n=Math.max(0,Math.min(S.length-1,cur+d));if(n===cur)return;log('換頁',{到:S[n].key});cur=n;render();speak(speakText())}
+$('pPrev').onclick=()=>go(-1);$('pNext').onclick=()=>go(1);
+const LV=['獨立','一次提示','多次提示','一起完成'];
+function renderPanel(){
+ const s=S[cur];$('pStep').textContent=`第 ${cur+1}／${S.length} 步｜${s.task}`;
+ $('pLevel').innerHTML=LV.map(l=>`<button data-lv="${l}" class="${levels[s.task]===l?'on':''}">${l}</button>`).join('');
+ $('pNote').value=notes[s.task]||'';
+ let c='';
+ if(s.card){c=`<h4>心情卡（參考答案：${s.card.ans}）</h4><div class="row seg" id="cMark">${['自己說對','用選項','需要提示'].map(x=>`<button data-cm="${x}" class="${choice[s.key+'_mark']===x?'on':''}">${x}</button>`).join('')}</div>`}
+ if(s.key==='rec1'||s.key==='ask'){c=`<h4>錄音一有說到的要素（播放錄音一後勾選）</h4><div class="row">${EL.map(e=>`<label class="ck"><input type="checkbox" data-el="${e.k}" ${marked[e.k]?'checked':''}>${e.k}</label>`).join('')}</div><div class="row" style="margin-top:8px"><button class="pri" id="sendAsk">送出追問卡</button></div>`}
+ if(s.key==='rec2'||s.key==='listen'){c=`<h4>錄音二有說到的要素</h4><div class="row">${EL.map(e=>`<label class="ck"><input type="checkbox" data-el2="${e.k}" ${marked2[e.k]?'checked':''}>${e.k}</label>`).join('')}</div>`}
+ $('pCtx').innerHTML=c;
+ const sa=$('sendAsk');if(sa)sa.onclick=()=>{askList=EL.filter(e=>!marked[e.k]);askIdx=0;S.find(x=>x.key==='ask')._sent=true;log('送出追問卡',{錄音一有說到:EL.filter(e=>marked[e.k]).map(e=>e.k),追問:askList.map(e=>e.k)});cur=S.findIndex(x=>x.key==='ask');render();speak(speakText())};
+ renderClips();renderLog()}
+$('pCtx').addEventListener('change',e=>{const t=e.target;if(t.dataset.el){marked[t.dataset.el]=t.checked;log('要素勾選（錄音一）',{要素:t.dataset.el,有說到:t.checked})}if(t.dataset.el2){marked2[t.dataset.el2]=t.checked;log('要素勾選（錄音二）',{要素:t.dataset.el2,有說到:t.checked})}});
+$('pCtx').addEventListener('click',e=>{const b=e.target.closest('[data-cm]');if(!b)return;const s=S[cur];choice[s.key+'_mark']=b.dataset.cm;log('老師標記',{心情卡:b.dataset.cm});renderPanel()});
+$('pLevel').addEventListener('click',e=>{const b=e.target.closest('[data-lv]');if(!b)return;const s=S[cur];levels[s.task]=b.dataset.lv;log('提示程度',{任務:s.task,程度:b.dataset.lv});renderPanel()});
+$('pNote').addEventListener('input',e=>{notes[S[cur].task]=e.target.value});
+function renderClips(){$('pClips').innerHTML=clips.length?clips.map(c=>`<div class="clip"><span style="flex:1">${esc(c.label)}</span><button data-play="${c.url}">播放</button></div>`).join(''):'<div class="sub" style="font-size:16px">還沒有錄音</div>'}
+async function renderLog(){const ev=(await all('events')).filter(x=>x.lesson===LESSON).slice(-40).reverse();$('pLog').innerHTML=ev.map(x=>`<div>${esc(x.ts.slice(11,19))}｜${esc(x.task)}｜${esc(x.type)}${x.data&&Object.keys(x.data).length?'：'+esc(JSON.stringify(x.data).replace(/[{}"]/g,'')):''}</div>`).join('')||'還沒有紀錄'}
+$('pNameSave').onclick=()=>{NAME=$('pName').value.trim()||'大吉';lsSet('daji-name',NAME);render()};
+$('pName').value=NAME;
+
+/* 匯出：一個 JSON 檔，錄音以 base64 放在裡面 */
+const b64=blob=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.onerror=()=>r(null);f.readAsDataURL(blob)});
+$('pExport').onclick=async()=>{
+ const ev=(await all('events')).filter(x=>x.lesson===LESSON);const au=(await all('audio')).filter(x=>x.lesson===LESSON);
+ const audio=[];for(const a of au){audio.push({ts:a.ts,label:a.label,mime:a.mime,data:a.blob?await b64(a.blob):null})}
+ const out={課次:'第 1 堂｜說一件事給家人聽',匯出時間:now(),提示程度:levels,備註:notes,
+  六要素:{錄音一:EL.map(e=>({要素:e.k,有說到:!!marked[e.k]})),追問:askList.map(e=>e.k),錄音二:EL.map(e=>({要素:e.k,有說到:!!marked2[e.k]}))},
+  選擇:choice,紀錄:ev,錄音:audio};
+ const d=new Date();const fn=`${LESSON}_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.json`;
+ const url=URL.createObjectURL(new Blob([JSON.stringify(out,null,1)],{type:'application/json'}));
+ const a=document.createElement('a');a.href=url;a.download=fn;document.body.appendChild(a);a.click();a.remove();
+ log('匯出紀錄',{檔名:fn})};
+$('pClear').onclick=()=>{$('mText').textContent='確定要清除這台 iPad 上的所有作答與錄音嗎？請先確認已經匯出並能打開檔案。';$('modal').style.display='grid'};
+$('mNo').onclick=()=>$('modal').style.display='none';
+$('mYes').onclick=async()=>{await clearAll();clips.length=0;$('modal').style.display='none';renderPanel()};
+
+if(window.speechSynthesis)try{speechSynthesis.onvoiceschanged=()=>{}}catch(e){}
+openDB().then(()=>{render()});
+render();
+}
+</script>
+</body>
+</html>
