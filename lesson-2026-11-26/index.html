@@ -135,6 +135,7 @@ button:focus-visible{outline:4px solid var(--help);outline-offset:2px}
     <div class="row"><button class="pri" id="pExport">匯出紀錄</button><button id="pClear">清除 iPad 上的紀錄</button></div>
   </div>
 </aside>
+<div class="modal" id="pin"><div class="box" style="text-align:center"><div id="pinMsg"></div><div id="pinDots" style="font-size:34px;letter-spacing:12px;min-height:44px"></div><div id="pinPad" style="display:grid;grid-template-columns:repeat(3,72px);gap:10px;justify-content:center"></div><div class="row" style="justify-content:center"><button id="pinCancel">取消</button></div></div></div>
 <div class="modal" id="modal"><div class="box"><div id="mText"></div><div class="row"><button id="mNo">取消</button><button class="pri" id="mYes" style="background:#b3261e;color:#fff">確定清除</button></div></div></div>
 
 <script>
@@ -318,8 +319,21 @@ $('bAgain').onclick=()=>{log('再聽一次',{});speak(speakText())};
 
 /* ---------- 教師面板 ---------- */
 const openP=()=>{$('panel').classList.add('open');renderPanel()};
-$('tbtn').onclick=openP;
-$('pClose').onclick=()=>$('panel').classList.remove('open');
+/* 教師密碼：第一次使用時設定 4 位數，存在這台 iPad */
+let PIN=lsGet('daji-pin',''),pinIn='',pinNew='',pinOk=false;
+function pinShow(){const m=!PIN?(pinNew?'請再輸入一次，確認密碼':'第一次使用：請設定 4 位數的教師密碼'):'請輸入教師密碼';$('pinMsg').textContent=m;$('pinDots').textContent='●'.repeat(pinIn.length)+'○'.repeat(4-pinIn.length)}
+$('pinPad').innerHTML=['1','2','3','4','5','6','7','8','9','','0','⌫'].map(k=>k?`<button data-k="${k}" style="min-height:64px;font-size:26px;background:#eef1f5">${k}</button>`:'<span></span>').join('');
+$('pinPad').onclick=e=>{const b=e.target.closest('[data-k]');if(!b)return;const k=b.dataset.k;
+ if(k==='⌫'){pinIn=pinIn.slice(0,-1);return pinShow()}
+ if(pinIn.length<4)pinIn+=k;pinShow();if(pinIn.length<4)return;
+ setTimeout(()=>{
+  if(!PIN){if(!pinNew){pinNew=pinIn;pinIn='';return pinShow()}
+   if(pinIn===pinNew){PIN=pinIn;lsSet('daji-pin',PIN);pinOk=true;closePin();openP()}else{pinNew='';pinIn='';$('pinMsg').textContent='兩次不一樣，請重新設定';$('pinDots').textContent='○○○○'}return}
+  if(pinIn===PIN){pinOk=true;closePin();openP()}else{pinIn='';$('pinMsg').textContent='密碼不對，請再試一次';$('pinDots').textContent='○○○○';log('教師密碼錯誤',{})}},150)};
+function closePin(){$('pin').style.display='none';pinIn='';pinNew=''}
+$('pinCancel').onclick=closePin;
+$('tbtn').onclick=()=>{if(pinOk)return openP();pinIn='';pinNew='';pinShow();$('pin').style.display='grid'};
+$('pClose').onclick=()=>{$('panel').classList.remove('open');pinOk=false};
 function go(d){stopRec();const n=Math.max(0,Math.min(S.length-1,cur+d));if(n===cur)return;log('換頁',{到:S[n].key});cur=n;render();speak(speakText())}
 $('pPrev').onclick=()=>go(-1);$('pNext').onclick=()=>go(1);
 const LV=['獨立','一次提示','多次提示','一起完成'];
@@ -332,7 +346,7 @@ function renderPanel(){
  if(s.key==='rec1'||s.key==='ask'){c=`<h4>錄音一有說到的要素（播放錄音一後勾選）</h4><div class="row">${EL.map(e=>`<label class="ck"><input type="checkbox" data-el="${e.k}" ${marked[e.k]?'checked':''}>${e.k}</label>`).join('')}</div><div class="row" style="margin-top:8px"><button class="pri" id="sendAsk">送出追問卡</button></div>`}
  if(s.key==='rec2'||s.key==='listen'){c=`<h4>錄音二有說到的要素</h4><div class="row">${EL.map(e=>`<label class="ck"><input type="checkbox" data-el2="${e.k}" ${marked2[e.k]?'checked':''}>${e.k}</label>`).join('')}</div>`}
  $('pCtx').innerHTML=c;
- const sa=$('sendAsk');if(sa)sa.onclick=()=>{askList=EL.filter(e=>!marked[e.k]);askIdx=0;S.find(x=>x.key==='ask')._sent=true;$('panel').classList.remove('open');log('送出追問卡',{錄音一有說到:EL.filter(e=>marked[e.k]).map(e=>e.k),追問:askList.map(e=>e.k)});cur=S.findIndex(x=>x.key==='ask');render();speak(speakText())};
+ const sa=$('sendAsk');if(sa)sa.onclick=()=>{askList=EL.filter(e=>!marked[e.k]);askIdx=0;S.find(x=>x.key==='ask')._sent=true;$('panel').classList.remove('open');pinOk=false;log('送出追問卡',{錄音一有說到:EL.filter(e=>marked[e.k]).map(e=>e.k),追問:askList.map(e=>e.k)});cur=S.findIndex(x=>x.key==='ask');render();speak(speakText())};
  renderClips();renderLog()}
 $('pCtx').addEventListener('change',e=>{const t=e.target;if(t.dataset.el){marked[t.dataset.el]=t.checked;log('要素勾選（錄音一）',{要素:t.dataset.el,有說到:t.checked})}if(t.dataset.el2){marked2[t.dataset.el2]=t.checked;log('要素勾選（錄音二）',{要素:t.dataset.el2,有說到:t.checked})}});
 $('pCtx').addEventListener('click',e=>{const b=e.target.closest('[data-cm]');if(!b)return;const s=S[cur];choice[s.key+'_mark']=b.dataset.cm;log('老師標記',{心情卡:b.dataset.cm});renderPanel()});
