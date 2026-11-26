@@ -114,6 +114,19 @@ button:disabled{opacity:.45;cursor:default}
 .bench{display:grid;gap:8px;width:100%;max-width:470px}
 .bench div{background:#fff;border-radius:12px;padding:8px 14px;text-align:left;font-size:19px}
 
+.bignum{font-family:"Noto Sans TC",sans-serif;font-size:130px;line-height:1.1;background:#fff;border-radius:22px;padding:10px 40px;letter-spacing:.06em}
+.pv{display:flex;gap:10px;align-items:flex-end}
+.pv div{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:20px;color:var(--muted)}
+.pv .d{width:84px;height:92px;border-radius:14px;border:3px solid var(--line);background:#fff;display:grid;place-items:center;font-size:52px;color:var(--ink);font-family:"Noto Sans TC",sans-serif}
+.pv .d.cur{border-color:var(--accent)}.pv .d.ok{border-color:var(--ok);background:#e6f4ec}
+.cashrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;background:#fff;border-radius:16px;padding:8px 12px;width:100%;max-width:520px}
+.cashrow .lb{font-size:18px;color:var(--muted);width:100%;text-align:left}
+.bill{width:118px;height:58px;border-radius:8px;background:#e9a7a0;border:3px solid #9e4a42;display:grid;place-items:center;font-size:24px;color:#5a1f1a;font-family:"Noto Sans TC",sans-serif}
+.circs{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.circ{width:104px;height:104px;border-radius:50%;border:4px solid var(--ink);background:#fff;display:grid;place-items:center;font-size:30px;padding:0;min-height:0;font-family:"Noto Sans TC",sans-serif}
+.circ.e{border-style:dashed;border-color:#9fb8cf;color:#9fb8cf;font-size:20px}
+.circs.sm .circ{width:72px;height:72px;font-size:22px;border-width:3px}
+.money{background:#fff4c2;border:2px solid #e2c35a;border-radius:14px;padding:6px 16px;font-size:24px}
 /* 計算機 */
 .calc{background:#2b2f38;border-radius:18px;padding:12px;width:100%;max-width:340px;display:grid;gap:8px}
 .calc .dsp{background:#d9e4d0;border-radius:10px;font-size:34px;text-align:right;padding:6px 12px;min-height:56px;font-family:"Noto Sans TC",sans-serif;overflow:hidden}
@@ -186,6 +199,7 @@ button:disabled{opacity:.45;cursor:default}
     </div>
     <div><h4>本次紀錄</h4><div class="log" id="pLog"></div></div>
     <div><h4>角色名稱</h4><div class="row"><input type="text" id="pName" style="flex:1"><button id="pNameSave">儲存</button></div></div>
+    <div class="row"><a href="./print.html" style="font-size:16px;background:#e7effa;color:#3a6fb0;padding:10px 14px;border-radius:12px;text-decoration:none">紙本版（沒帶 iPad 時列印）</a></div>
     <div class="row"><button class="pri" id="pExport">匯出紀錄</button><button id="pClear">清除數學小站的紀錄</button></div>
     <div class="ans">數學小站的紀錄和上課頁分開存放；清除這裡不會影響上課頁的紀錄。</div>
   </div>
@@ -193,6 +207,7 @@ button:disabled{opacity:.45;cursor:default}
 <div class="modal" id="pin"><div class="box2" style="text-align:center"><div id="pinMsg"></div><div id="pinDots" style="font-size:34px;letter-spacing:12px;min-height:44px"></div><div id="pinPad" style="display:grid;grid-template-columns:repeat(3,72px);gap:10px;justify-content:center"></div><div class="row" style="justify-content:center"><button id="pinCancel" style="background:#eef1f5;min-height:48px">取消</button></div></div></div>
 <div class="modal" id="modal"><div class="box2"><div id="mText"></div><div class="row"><button id="mNo" style="background:#eef1f5;min-height:48px">取消</button><button id="mYes" style="background:#b3261e;color:#fff;min-height:48px">確定</button></div></div></div>
 
+<script src="questions.js?v=3"></script>
 <script>
 /* ================= 共用小工具 ================= */
 const LESSON='math';
@@ -205,93 +220,32 @@ let NAME=lsGet('daji-name','大吉');
 const nm=s=>String(s).split('NAME').join(NAME);
 const clean=t=>String(t).replace(/[\s，。、！？,.!?「」：:]/g,'');
 
-/* 亂數：同一天打開，題目一樣（重新整理不會換題） */
-function seeded(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
-let R=Math.random;
-const ri=(a,b)=>a+Math.floor(R()*(b-a+1));
-const pick=a=>a[Math.floor(R()*a.length)];
-const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-
 /* 中文數字 → 阿拉伯數字（語音辨識可能給「四十五」） */
 function cnNum(s){const d={零:0,〇:0,一:1,二:2,兩:2,两:2,三:3,四:4,五:5,六:6,七:7,八:8,九:9};
  return String(s).replace(/[零〇一二兩两三四五六七八九十百]+/g,m=>{let total=0,cur=0;for(const ch of m){if(ch in d)cur=d[ch];else if(ch==='十'){total+=(cur||1)*10;cur=0}else if(ch==='百'){total+=(cur||1)*100;cur=0}}return String(total+cur)})}
 const numsIn=t=>(cnNum(t).match(/\d+/g)||[]).map(Number);
 
 /* ================= 設定（層級） ================= */
-const A_LV={1:'A1 大數量點數',2:'A2 十個一數',3:'A3 五個一數',4:'A4 兩個一數',5:'A5 混合數錢'};
-const B_LV={1:'B1 不用算／比大小',2:'B2 加：合起來',3:'B3 減：剩下、找回',4:'B4 加減混合'};
-const C_TOP={len:'長度',cap:'容量',wt:'重量'};
-let CFG={A:1,B:1,C:['len']};
-try{const c=JSON.parse(lsGet('daji-math-cfg','null'));if(c&&c.A&&c.B&&Array.isArray(c.C))CFG=c}catch(e){}
+let CFG={A:0,B:2,C:['len'],v:3};
+try{const c=JSON.parse(lsGet('daji-math-cfg','null'));if(c&&c.B&&Array.isArray(c.C)){CFG=c;if(!c.v){CFG.A=0;CFG.v=3;lsSet('daji-math-cfg',JSON.stringify(CFG))}}}catch(e){}
 const saveCfg=()=>lsSet('daji-math-cfg',JSON.stringify(CFG));
 
-/* ================= 出題 ================= */
-const COUNT_ITEMS=[['🍎','蘋果','顆'],['✏️','鉛筆','枝'],['🥚','雞蛋','顆'],['⭐','星星','個'],['🍬','糖果','顆']];
-const GOODS=[['吐司',45,'🍞'],['牛奶',30,'🥛'],['飯糰',35,'🍙'],['麵包',28,'🥐'],['綠茶',25,'🍵'],['香蕉',20,'🍌'],['餅乾',18,'🍪'],['優格',32,'🥣'],['布丁',22,'🍮'],['豆漿',26,'🥤']];
-const UNITS={
- len:{opts:['毫米','公分','公尺'],items:[['✏️','一枝鉛筆','有多長','公分'],['🥢','一雙筷子','有多長','公分'],['🧽','一塊橡皮擦','有多長','公分'],['🐜','一隻螞蟻','有多長','毫米'],['🍚','一粒米','有多長','毫米'],['🪙','一枚硬幣','有多厚','毫米'],['🏃','操場的跑道','有多長','公尺'],['🏊','游泳池','有多長','公尺'],['🚌','一輛公車','有多長','公尺']],
-  bench:['1 毫米：差不多一張卡片那麼厚','1 公分：差不多指甲那麼寬','1 公尺：差不多張開手臂那麼長'],
-  keys:[['毫米','毫米'],['公分','公分'],['公分','釐米'],['公分','厘米'],['公尺','公尺']]},
- cap:{opts:['毫升','公升'],items:[['🥛','一杯水','有多少','毫升'],['🧃','一小罐養樂多','有多少','毫升'],['🥄','一湯匙醬油','有多少','毫升'],['🪣','一大桶水','有多少','公升'],['🛁','一缸洗澡水','有多少','公升']],
-  bench:['1 毫升：差不多一滴一滴的一小點點','1 公升：差不多一大瓶礦泉水再多一點'],
-  keys:[['毫升','毫升'],['公升','公升']]},
- wt:{opts:['公克','公斤'],items:[['🥚','一顆雞蛋','有多重','公克'],['🍪','一片餅乾','有多重','公克'],['✏️','一枝鉛筆','有多重','公克'],['🍚','一袋米','有多重','公斤'],['🍉','一顆西瓜','有多重','公斤'],['🧍','一個人的體重','是多少','公斤']],
-  bench:['1 公克：差不多一個迴紋針那麼輕','1 公斤：差不多一大瓶礦泉水再重一點'],
-  keys:[['公克','公克'],['公克','克'],['公斤','公斤']]}};
-
-function scatter(n){const pts=[];let guard=0;while(pts.length<n&&guard<5000){guard++;const x=6+R()*88,y=8+R()*84;if(pts.every(p=>Math.hypot((p[0]-x)*1.33,p[1]-y)>11))pts.push([x,y])}while(pts.length<n)pts.push([6+R()*88,8+R()*84]);return pts}
-
-function genA(lv){
- if(lv===1){const [e,n,u]=pick(COUNT_ITEMS);const N=ri(23,44);return {strand:'A',level:1,type:'count',emoji:e,name:n,unit:u,N,pts:scatter(N),ans:N,text:`數一數，${n}總共有幾${u}？`,how:'數過的點一下做記號。十個一組，比較不會數錯。'}}
- if(lv===2||lv===3){const v=lv===2?10:5,n=ri(4,9);return {strand:'A',level:lv,type:'skip',coin:v,n,step:v,unit:'元',ans:v*n,text:`一個 ${v} 元。${v===10?'十':'五'}元${v===10?'十':'五'}元往上數，總共多少元？`}}
- if(lv===4){const n=ri(4,9);return {strand:'A',level:4,type:'skip',pair:true,n,step:2,unit:'隻',ans:2*n,text:`一雙鞋子有 2 隻。兩隻兩隻往上數，總共有幾隻鞋子？`}}
- const coins=[];if(R()<.7)coins.push(50);for(let i=ri(1,3);i>0;i--)coins.push(10);if(R()<.6)coins.push(5);for(let i=ri(0,3);i>0;i--)coins.push(1);
- if(coins.length<3)coins.push(10);
- return {strand:'A',level:5,type:'mixed',coins:shuffle(coins),unit:'元',ans:coins.reduce((a,b)=>a+b,0),text:'錢包裡有這些錢。先從大的開始數，總共多少元？'}}
-
-const W_ADD=['總共要付多少錢？','一共要付多少錢？','合起來是多少錢？','全部要付多少錢？'];
-function genB(lv){
- if(lv===4)lv=pick([1,2,2,3,3]);
- const two=shuffle(GOODS).slice(0,2).map(g=>[g[0],g[1]+ri(-3,3),g[2]]);
- if(lv===1){
-  if(R()<.6){const [a,pa,ea]=two[0];const enough=R()<.5;const w=enough?pa+ri(3,30):Math.max(5,pa-ri(3,15));const W=Math.round(w);
-   return {strand:'B',level:1,type:'op',op:'none',goods:[[a,pa,ea]],seg:['錢包裡有 ',{n:W,need:1},' 元。',a,'要 ',{n:pa,need:1},' 元。錢夠不夠？'],ans:W>=pa?'夠':'不夠',ansOpts:['夠','不夠'],why:`${W} 元和 ${pa} 元比一比。`}}
-  const [[a,pa,ea],[b,pb,eb]]=two;if(pa===pb)return genB(1);
-  return {strand:'B',level:1,type:'op',op:'none',goods:[[a,pa,ea],[b,pb,eb]],seg:[a,' ',{n:pa,need:1},' 元，',b,' ',{n:pb,need:1},' 元。哪一個比較貴？'],ans:pa>pb?a:b,ansOpts:[a,b],why:`${pa} 元和 ${pb} 元比一比。`}}
- if(lv===2){
-  if(R()<.75){const [[a,pa,ea],[b,pb,eb]]=two;const w=pick(W_ADD);
-   return {strand:'B',level:2,type:'op',op:'+',goods:[[a,pa,ea],[b,pb,eb]],seg:['NAME買了',a,'（',{n:pa,need:1},' 元）和',b,'（',{n:pb,need:1},' 元）。',w],nums:[pa,pb],ans:pa+pb,unit:'元',check:{q:`總共的錢，會比 ${Math.max(pa,pb)} 元多，還是比 ${Math.max(pa,pb)} 元少？`,ans:'比較多',opts:['比較多','比較少']}}}
-  const x=ri(12,40),y=ri(5,20);
-  return {strand:'B',level:2,type:'op',op:'+',goods:[['書',null,'📚']],seg:['書架上有 ',{n:x,need:1},' 本書，老師又放上 ',{n:y,need:1},' 本。現在書架上總共有幾本書？'],nums:[x,y],ans:x+y,unit:'本',check:{q:`現在的書，會比 ${x} 本多，還是比 ${x} 本少？`,ans:'比較多',opts:['比較多','比較少']}}}
- const r=R();const [a,pa,ea]=two[0];
- if(r<.4){const m=pick([100,120,150,200]);const w=pick(['卡裡還剩多少錢？','卡裡還有多少錢？']);
-  return {strand:'B',level:3,type:'op',op:'-',goods:[[a,pa,ea]],seg:['NAME的練習儲值卡裡有 ',{n:m,need:1},' 元，買了',a,'（',{n:pa,need:1},' 元）。',w],nums:[m,pa],ans:m-pa,unit:'元',check:{q:`剩下的錢，會比 ${m} 元多，還是比 ${m} 元少？`,ans:'比較少',opts:['比較多','比較少']}}}
- if(r<.7){return {strand:'B',level:3,type:'op',op:'-',goods:[[a,pa,ea]],seg:['NAME付了 ',{n:100,need:1},' 元，買了',a,'（',{n:pa,need:1},' 元）。店員要找回多少錢？'],nums:[100,pa],ans:100-pa,unit:'元',check:{q:'找回的錢，會比 100 元多，還是比 100 元少？',ans:'比較少',opts:['比較多','比較少']}}}
- const k=ri(6,18);
- return {strand:'B',level:3,type:'op',op:'-',goods:[['雞蛋',null,'🥚']],seg:['一盒雞蛋有 ',{n:30,need:1},' 顆，用掉了 ',{n:k,need:1},' 顆。還剩幾顆？'],nums:[30,k],ans:30-k,unit:'顆',check:{q:'剩下的雞蛋，會比 30 顆多，還是比 30 顆少？',ans:'比較少',opts:['比較多','比較少']}}}
-
-function genC(topic){const U=UNITS[topic];const [e,n,ask,ans]=pick(U.items);return {strand:'C',topic,type:'unit',emoji:e,name:n,ask,ans,opts:U.opts,bench:U.bench,keys:U.keys,text:`要知道${n}${ask}，要用哪一個單位？`}}
-
-function makeQ(strand,idx){
- if(strand==='A'){let lv=CFG.A;if(lv>1&&R()<.35)lv=ri(1,lv-1);return genA(lv)}
- if(strand==='B'){let lv=CFG.B;if(lv>1&&lv<4&&R()<.35)lv=ri(1,lv-1);return genB(lv)}
- const tops=CFG.C.length?CFG.C:['len'];return genC(tops[idx%tops.length])}
-
 /* ================= 步驟 ================= */
-const PH={count:[['look','看'],['count','數'],['say','說']],skip:[['count','數'],['say','說']],mixed:[['order','看'],['count','數'],['say','說']],
+const PH={read:[['pick','選'],['say','唸']],write:[['write','寫'],['say','唸']],cash:[['write','寫'],['say','唸']],
+ shop:[['circles','畫圈圈'],['price','畫圈圈'],['ask','判斷'],['same','判斷'],['op','判斷'],['expr','列式'],['calc','算'],['check','檢查']],
+ count:[['look','看'],['count','數'],['say','說']],skip:[['count','數'],['say','說']],mixed:[['order','看'],['count','數'],['say','說']],
  opcalc:[['look','看'],['judge','判斷'],['expr','列式'],['calc','算'],['check','檢查']],opnone:[['look','看'],['judge','判斷'],['answer','回答'],['why','說理由']],
  unit:[['judge','判斷'],['why','說理由']]};
-const phasesOf=q=>q.type==='op'?(q.op==='none'?PH.opnone:PH.opcalc):PH[q.type];
+const phasesOf=q=>q.type==='op'?(q.op==='none'?PH.opnone:PH.opcalc):q.type==='shop'?(q.ask==='left'?PH.shop.filter(p=>p[0]!=='same'):PH.shop):PH[q.type];
 let S=[],cur=0;const levels={},notes={};
 function buildDay(rand){
  const d=new Date();const day=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
  R=rand?Math.random:seeded(day*7+CFG.A*131+CFG.B*17+CFG.C.join('').length);
  const cIdx=Math.floor(day/1)%997;
- const qs=[makeQ('A',0),makeQ('B',0),makeQ('C',cIdx)];R=Math.random;
+ const qs=[makeQ('A',0,CFG),makeQ('B',0,CFG),makeQ('C',cIdx,CFG)];R=Math.random;
  S=[{key:'flow',title:'今天的數學小站'}].concat(qs.map((q,i)=>({key:'q'+(i+1),title:`第 ${i+1}／3 題`,q,x:freshX(q)}))).concat([{key:'end',title:'完成了'}]);
  cur=0}
-function freshX(q){return {ph:0,hits:[],tries:[],judgeWrong:0,judgeRes:'',usedOpts:false,choice:null,shown:null,slots:[null,null,null],exprWrong:0,exprOk:false,entry:'',chain:[],chainWrong:0,ansTries:[],calcUsed:false,calcEarly:0,checkPick:null,checkRes:'',order:[],marks:{},countWrong:0,result:'',mark:''}}
+function freshX(q){return {ph:0,hits:[],tries:[],judgeWrong:0,judgeRes:'',usedOpts:false,choice:null,shown:null,slots:[null,null,null],exprWrong:0,exprOk:false,entry:'',chain:[],chainWrong:0,ansTries:[],calcUsed:false,calcEarly:0,checkPick:null,checkRes:'',order:[],marks:{},countWrong:0,result:'',mark:'',circ:[],optRes:{},wrongs:{},sopt:null,sshown:{}}}
 const Q=()=>S[cur].q, X=()=>S[cur].x;
 const phKey=()=>{const q=Q();return phasesOf(q)[X().ph][0]};
 
@@ -301,7 +255,6 @@ function openDB(){return new Promise(res=>{try{const r=indexedDB.open('daji-math
 function put(o){if(!db){mem.push(o);return}try{db.transaction('events','readwrite').objectStore('events').add(o)}catch(e){mem.push(o)}}
 function allEv(){return new Promise(res=>{if(!db)return res(mem.slice());try{const q=db.transaction('events').objectStore('events').getAll();q.onsuccess=()=>res(q.result.concat(mem));q.onerror=()=>res(mem.slice())}catch(e){res(mem.slice())}})}
 function clearAll(){mem.length=0;return new Promise(res=>{if(!db)return res();try{const t=db.transaction('events','readwrite');t.objectStore('events').clear();t.oncomplete=()=>res();t.onerror=()=>res()}catch(e){res()}})}
-function qLabel(q){return q.strand==='C'?`C ${C_TOP[q.topic]}`:`${q.strand}${q.level}`}
 function log(type,data){const s=S[cur];put({lesson:LESSON,ts:now(),step:s.key,題:s.q?qLabel(s.q):'',type,data:data||{}});if($('panel').classList.contains('open'))renderLog()}
 
 /* ================= 朗讀 ================= */
@@ -309,15 +262,22 @@ let voice=null;
 function pickVoice(){try{const v=speechSynthesis.getVoices();voice=v.find(x=>/zh[-_]TW/i.test(x.lang))||v.find(x=>/zh/i.test(x.lang))||null}catch(e){}}
 if(window.speechSynthesis){pickVoice();try{speechSynthesis.onvoiceschanged=pickVoice}catch(e){}}
 function speak(t){try{speechSynthesis.cancel();if(!t)return;const u=new SpeechSynthesisUtterance(nm(t));u.lang='zh-TW';u.rate=.85;if(voice)u.voice=voice;speechSynthesis.speak(u)}catch(e){}}
-function qText(q){return q.seg?q.seg.map(p=>typeof p==='object'?p.n:p).join(''):q.text}
 function promptOf(){const s=S[cur];if(s.key==='flow')return '今天的數學小站有三題。每一題都要先想一想，再算。';if(s.key==='end')return '今天的數學小站完成了！';
  const q=s.q,k=phKey();
  if(k==='judge')return q.type==='unit'?q.text:'要用加的、減的，還是不用算？選一個。';
+ if(k==='pick')return q.text;
+ if(k==='write')return q.type==='write'?q.reading:q.text;
+ if(k==='circles')return nm(q.text)+'要買幾個東西？';
+ if(k==='price')return '每個圈圈，寫上價錢。';
+ if(k==='ask')return '題目問的是一共，還是剩下？';
+ if(k==='same')return '圈圈裡的價錢，都一樣嗎？';
+ if(k==='op')return '所以要用加、減，還是乘？';
  if(k==='expr')return '用下面的卡片，排出算式。';
  if(k==='calc')return '算出答案。可以打開計算機。';
  if(k==='check')return q.check.q;
  if(k==='answer')return qText(q);
  if(k==='why')return q.type==='unit'?'說說看，為什麼用這個單位？':'說說看，你怎麼知道的？';
+ if(k==='say'&&['read','write','cash'].includes(q.type)){const n=q.n||q.ans;return `${n}，唸作${cnRead(n)}。`}
  if(k==='say')return `說說看：總共${q.type==='count'?'有幾'+q.unit:'多少'+q.unit}？`;
  return nm(qText(q))}
 
@@ -342,15 +302,25 @@ function micBlock(label){const last=lastTry();
 const OPW={'+':['加','家','佳','總共','一共','合起來','全部'],'-':['減','剪','扣','剩','找','少','拿走'],'none':['不用','不需要','比一比','比大小','比較']};
 function detectOp(t){t=clean(t);const h=Object.keys(OPW).filter(k=>OPW[k].some(w=>t.includes(w)));return h.length===1?h[0]:(h.length?'?':'')}
 function detectUnit(q,t){t=clean(t);for(const [u,k] of q.keys)if(t.includes(k))return u;return ''}
-const OPNAME={'+':'加','-':'減','none':'不用算'};
 
 /* ================= 畫面 ================= */
 function stepsBar(){const q=Q(),P=phasesOf(q),x=X();
- const calcLocked=!(q.type==='op'&&q.op!=='none'&&['calc','check'].includes(phKey()));
- const calc=(q.type==='op')?`<button class="calcbtn ${calcOpen?'open':''}" data-calc="1">🧮 計算機${calcLocked?'（還沒開）':''}</button>`:'';
- return `<div class="steps">${P.map((p,i)=>`<span class="${i===x.ph?'on':i<x.ph?'pd':''}">${p[1]}</span>`).join('<em>→</em>')}${calc}</div>`}
+ const calcLocked=!(q.type==='shop'&&['calc','check'].includes(phKey()));
+ const calc=(q.type==='op'||q.type==='shop')?`<button class="calcbtn ${calcOpen?'open':''}" data-calc="1">🧮 計算機${calcLocked?'（還沒開）':''}</button>`:'';
+ const G=[];P.forEach((p,i)=>{const last=G[G.length-1];if(last&&last.l===p[1])last.e=i;else G.push({l:p[1],s:i,e:i})});
+ return `<div class="steps">${G.map(g=>`<span class="${x.ph>=g.s&&x.ph<=g.e?'on':x.ph>g.e?'pd':''}">${g.l}</span>`).join('<em>→</em>')}${calc}</div>`}
 function storyHTML(q){const x=X();return `<div class="card story">${q.seg.map((p,i)=>typeof p==='object'?`<button class="num ${x.hits.includes(i)?'hit':''}" data-num="${i}">${p.n}</button>`:esc(nm(p))).join('')}</div>`}
 function goodsHTML(q){const x=X();return `<div class="goods">${q.goods.map(g=>{const si=g[1]!=null&&q.seg?q.seg.findIndex(p=>typeof p==='object'&&p.n===g[1]):-1;return `<div class="good"><span class="e">${g[2]}</span><span>${esc(g[0])}</span>${g[1]!=null?(si>-1?`<button class="num p ${x.hits.includes(si)?'hit':''}" data-num="${si}">${g[1]} 元</button>`:`<span class="p">${g[1]} 元</span>`):''}</div>`}).join('')}</div>`}
+function soptHTML(key,opts){const x=X();if(!x.sshown[key])x.sshown[key]=shuf(opts);const n=x.sshown[key].length;
+ return `<div class="opts" style="grid-template-columns:repeat(${n>3?2:n},minmax(0,1fr))">${x.sshown[key].map(o=>`<button class="opt ${x.sopt===String(o)?'sel':''}" data-sopt="${esc(o)}">${esc(o)}</button>`).join('')}</div>`}
+function pvHTML(str,live){const d=String(str).padEnd(3,' ').split('');return `<div class="pv">${['百','十','個'].map((l,i)=>`<div><span class="d ${live?(i===str.length?'cur':''):'ok'}">${d[i]===' '?'&nbsp;':esc(d[i])}</span>${l}</div>`).join('')}</div>`}
+function cashHTML(q){const row=(n,html,lb)=>n?`<div class="cashrow"><span class="lb">${lb}</span>${Array.from({length:n},()=>html).join('')}</div>`:'';
+ return row(q.h,'<div class="bill">100 元</div>','一百元')+row(q.t,'<div class="coin c10" style="width:64px;height:64px;font-size:22px">10</div>','十元')+row(q.o,'<div class="coin c1">1</div>','一元')}
+function countOpts(q){const s=new Set([q.count]);while(s.size<3){const v=Math.max(1,q.count+[-2,-1,1,2][Math.floor(Math.random()*4)]);s.add(v)}return [...s].map(String)}
+function circlesHTML(vals,small,tap){return `<div class="circs ${small?'sm':''}">${vals.map((v,i)=>`<button class="circ ${v==null?'e':''}" ${tap?`data-circ="${i}"`:''}>${v==null?'價錢':v}</button>`).join('')}</div>`}
+function shopLeft(q,k){const x=X();const act=k==='price';
+ return `<div class="goods">${q.goods.map(g=>`<div class="good"><span class="e">${g[2]}</span><span>${esc(g[0])}</span>${act?`<button class="num p" data-price="${g[1]}">${g[1]} 元</button>`:`<span class="p">${g[1]} 元</span>`}</div>`).join('')}</div>`
+  +(q.money?`<div class="money">💰 ${q.money} 元</div>`:'')+`<div class="card story">${esc(nm(q.text))}</div>`}
 function padHTML(){return `<div class="pad">${['1','2','3','4','5','6','7','8','9','0','⌫'].map(k=>`<button data-pad="${k}">${k}</button>`).join('')}<button class="ok" data-pad="ok">確定</button></div>`}
 let calcOpen=false,calcDisp='0',calcExpr='';
 function calcHTML(){return `<div class="calc"><div class="dsp" id="cdsp">${esc(calcDisp)}</div><div class="keys">${['7','8','9','÷','4','5','6','×','1','2','3','−','0','C','=','+'].map(k=>`<button data-ck="${k}" class="${'÷×−+='.includes(k)?'o':''}">${k}</button>`).join('')}</div></div>`}
@@ -388,15 +358,31 @@ function render(){
    if(k==='order')Rr+=`<div class="sub">先從大的開始：照順序一個一個點錢。點錯了可以再點一次取消。</div>`;
    if(k==='count')Rr+=`<div class="sub">照你排的順序，一個一個加上去，數到這一個總共多少？</div><div class="chain">${ord.map((_,i)=>`<div class="box ${i<done?'ok':i===done?'cur':''}">${i<done?x.chain[i]:i===done?(esc(x.entry)||'&nbsp;'):''}</div>`).join('')}</div>`+padHTML();
    if(k==='say')Rr+=`<div class="sub">可以說說看：「總共＿＿元。」說完或不說，都可以按「我做好了」。</div>`+micBlock()}
+  /* ---- A0：讀數與位值 ---- */
+  if(q.type==='read'){L=`<div class="bignum">${q.n}</div>`;
+   if(k==='pick')Rr+=`<div class="q">${esc(q.text)}</div><div class="sub">選一個。</div>`+soptHTML('pick',q.opts);
+   if(k==='say')Rr+=`<div class="q">${q.n} 唸作「${esc(q.ans)}」</div>`+pvHTML(String(q.n))+`<div class="sub">可以跟著唸一次。唸完或不唸，都可以按「我做好了」。</div>`+micBlock()}
+  if(q.type==='write'||q.type==='cash'){
+   L=q.type==='write'?`<button class="opt" data-listen="1" style="font-size:30px;min-height:96px;padding:0 40px">🔊 聽數字</button><div class="sub">可以聽很多次</div>`:cashHTML(q);
+   if(k==='write')Rr+=`<div class="q">${esc(q.text)}</div>`+pvHTML(x.entry,true)+padHTML();
+   if(k==='say')Rr+=`<div class="q">${q.ans}${q.type==='cash'?' 元':''}，唸作「${cnRead(q.ans)}${q.type==='cash'?'元':''}」</div>`+pvHTML(String(q.ans))+`<div class="sub">可以跟著唸一次。唸完或不唸，都可以按「我做好了」。</div>`+micBlock()}
+  /* ---- B：購物題（老師的步驟） ---- */
+  if(q.type==='shop'){
+   if(k==='circles')Rr+=`<div class="q">要買幾個東西？</div><div class="sub">看左邊的題目，每一樣買了幾個，加起來。</div>`+soptHTML('circles',countOpts(q));
+   if(k==='price')Rr+=`<div class="q">每個圈圈，寫上價錢。</div><div class="sub">點左邊的價錢，放進圈圈裡。放錯了，點圈圈可以拿出來。</div>`+circlesHTML(x.circ,false,true);
+   if(k==='ask')Rr+=circlesHTML(x.circ,true)+`<div class="q">題目問的是？</div><div class="sub">再讀一次題目的最後一句。</div>`+soptHTML('ask',['一共要付多少錢','還剩（找回）多少錢']);
+   if(k==='same')Rr+=circlesHTML(x.circ,true)+`<div class="q">圈圈裡的價錢，都一樣嗎？</div>`+soptHTML('same',['一樣','不一樣']);
+   if(k==='op')Rr+=circlesHTML(x.circ,true)+`<div class="q">所以要用？</div>`+soptHTML('op',['加','減','乘'])+sayMore('也可以說說看：為什麼？')}
   /* ---- B：運算判斷 ---- */
-  if(q.type==='op'){
-   L=goodsHTML(q)+storyHTML(q)+(calcOpen?calcHTML():'');
+  if(q.type==='op'||q.type==='shop'){
+   L=q.type==='op'?goodsHTML(q)+storyHTML(q)+(calcOpen?calcHTML():''):shopLeft(q,k)+(calcOpen?calcHTML():'');
    if(k==='look')Rr+=`<div class="q">先看左邊的題目。</div><div class="sub">把<b>要用到的數字</b>點一下。</div>`;
    if(k==='judge'){Rr+=`<div class="q">要用<b>加</b>的、<b>減</b>的，還是<b>不用算</b>？</div><div class="sub">選一個。</div>`;
     if(!x.shown)x.shown=shuf(['加','減','不用算']);Rr+=`<div class="opts" style="grid-template-columns:repeat(3,minmax(0,1fr))">${x.shown.map(o=>`<button class="opt ${x.choice===o?'sel':''}" data-opt="${o}">${o}</button>`).join('')}</div>`+sayMore('也可以說說看：為什麼？')}
-   if(k==='expr'){const tiles=shuf(q.nums.map(String)).concat(['＋','－']);if(!x.tiles)x.tiles=tiles;
-    Rr+=`<div class="q">用卡片排出算式。</div><div class="expr">${[0,1,2].map(i=>`<button class="slot ${i===1?'op':''} ${x.slots[i]!=null?'f':''}" data-slot="${i}">${x.slots[i]!=null?x.slots[i]:'&nbsp;'}</button>`).join('')}<span class="eq">＝　？</span></div><div class="sub">點卡片放進去；放錯了，點格子可以拿出來。</div><div class="tiles">${x.tiles.map(t=>`<button class="tile ${'＋－'.includes(t)?'op':''}" data-tile="${t}">${t}</button>`).join('')}</div>`}
+   if(k==='expr'){const tiles=shuf(q.nums.map(String)).concat(['＋','－','×']);if(!x.tiles)x.tiles=tiles;
+    Rr+=`<div class="q">用卡片排出算式。</div><div class="expr">${[0,1,2].map(i=>`<button class="slot ${i===1?'op':''} ${x.slots[i]!=null?'f':''}" data-slot="${i}">${x.slots[i]!=null?x.slots[i]:'&nbsp;'}</button>`).join('')}<span class="eq">＝　？</span></div><div class="sub">點卡片放進去；放錯了，點格子可以拿出來。</div><div class="tiles">${x.tiles.map(t=>`<button class="tile ${'＋－×'.includes(t)?'op':''}" data-tile="${t}">${t}</button>`).join('')}</div>`+(q.type==='shop'?circlesHTML(x.circ,true):'')}
    if(k==='calc'){Rr+=`<div class="expr"><div class="slot f">${x.slots[0]}</div><div class="slot f op">${x.slots[1]}</div><div class="slot f">${x.slots[2]}</div><span class="eq">＝</span><div class="box cur" style="min-width:110px">${esc(x.entry)||'&nbsp;'}</div><span>${esc(q.unit)}</span></div><div class="sub">可以心算，也可以按右上角打開計算機。算好了，用數字鍵輸入答案。</div>`+padHTML()}
+   if(k==='calc'&&q.op==='×')Rr+=`<div class="sub">也可以用加的：${Array(q.nums[1]).fill(q.nums[0]).join(' ＋ ')}</div>`;
    if(k==='check'){Rr+=`<div class="expr"><div class="slot f">${x.slots[0]}</div><div class="slot f op">${x.slots[1]}</div><div class="slot f">${x.slots[2]}</div><span class="eq">＝ ${q.ans}</span></div><div class="q">${esc(q.check.q)}</div>`;
     if(!x.cshown)x.cshown=shuf(q.check.opts);Rr+=`<div class="opts">${x.cshown.map(o=>`<button class="opt ${x.checkPick===o?'sel':''}" data-chk="${o}">${o}</button>`).join('')}</div>`}
    if(k==='answer'){Rr+=`<div class="q">${esc(nm(qText(q)))}</div><div class="sub">選一個。</div>`;
@@ -420,6 +406,9 @@ function need(){const s=S[cur];if(srOn)return '先說完喔。';if(!s.q)return '
  if(k==='count'){if(q.type==='count')return x.entry?'':'先輸入你數的數字喔。';const total=q.type==='skip'?q.n:q.coins.length;return x.chain.length>=total?'':'一個一個數完喔。'}
  if(k==='order')return x.order.length===q.coins.length?'':'把每一個錢都照順序點一下喔。';
  if(k==='judge')return x.choice?'':'先選一個喔。';
+ if(['pick','circles','ask','same','op'].includes(k))return x.sopt!=null?'':'先選一個喔。';
+ if(k==='write')return x.entry.length===3?'':'百、十、個三個格子都要寫喔。';
+ if(k==='price')return x.circ.every(v=>v!=null)?'':'每個圈圈都要放價錢喔。';
  if(k==='expr')return x.slots.every(v=>v!=null)?'':'先把算式排好喔。';
  if(k==='calc')return x.entry?'':'先輸入答案喔。';
  if(k==='check')return x.checkPick?'':'先選一個喔。';
@@ -427,7 +416,11 @@ function need(){const s=S[cur];if(srOn)return '先說完喔。';if(!s.q)return '
  if(k==='say'||k==='why')return '';
  return ''}
 
-function goPh(){const x=X();x.ph++;x.msg='';x.msgGood=false;x.choice=null;x.entry='';
+function optStep(key,ans,hint,label){const x=X();x.wrongs[key]=x.wrongs[key]||0;const ok=x.sopt===String(ans);log(label,{選:x.sopt,正確:ok,第幾次:x.wrongs[key]+1});
+ if(ok){x.optRes[key]=x.wrongs[key]?'第二次對':'第一次就對';x.sopt=null;return true}
+ x.wrongs[key]++;if(x.wrongs[key]>=2){x.optRes[key]='老師提示';x.sopt=null;x.pendMsg=`答案是「${ans}」。`;return true}
+ x.sopt=null;x.sshown[key]=null;x.msg=hint;x.msgGood=false;render();return false}
+function goPh(){const x=X();x.ph++;x.msg=x.pendMsg||'';x.pendMsg='';x.msgGood=false;x.choice=null;x.entry='';
  if(x.ph>=phasesOf(Q()).length){x.result=x.result||'完成';log('這一題完成',{});return advance()}
  render();speak(promptOf())}
 function advance(){calcOpen=false;if(cur<S.length-1){cur++;render();speak(promptOf())}}
@@ -455,12 +448,25 @@ function next(){const s=S[cur];const n=need();if(n)return note(n);if(!s.q){log('
   x.judgeWrong++;
   if(x.judgeWrong>=2){x.judgeRes='老師提示';x.msg=`這一題要用「${OPNAME[q.op]}」。想想看為什麼。`;x.msgGood=false;return goPh()}
   x.choice=null;x.shown=null;x.msg='再讀一次題目，想一想：東西變多了、變少了，還是比一比就好？';x.msgGood=false;speak(qText(q));return render()}
- if(k==='expr'){const [a,o,b]=x.slots;const want=q.op==='+'?'＋':'－';const nums=q.nums.map(String);
-  const ok=o===want&&(q.op==='+'?([a,b].sort().join()===nums.slice().sort().join()):(a===nums[0]&&b===nums[1]));
+ if(k==='pick'){if(optStep('pick',q.ans,'一個數字一個數字看：先看百位，再看十位、個位。','選唸法'))goPh();return}
+ if(k==='circles'){if(optStep('circles',String(q.count),'再看一次題目：每一樣東西買了幾個？加起來是幾個？','要買幾個')){x.circ=Array(q.count).fill(null);goPh()}return}
+ if(k==='ask'){if(optStep('ask',q.ask==='total'?'一共要付多少錢':'還剩（找回）多少錢','再讀一次題目最後一句：問「一共」，還是「剩下、找回」？','題目問什麼'))goPh();return}
+ if(k==='same'){const same=x.circ.every(v=>v===x.circ[0]);if(optStep('same',same?'一樣':'不一樣','看看圈圈裡的數字，每一個都一樣嗎？','價錢一樣嗎'))goPh();return}
+ if(k==='op'){if(optStep('op',OPNAME[q.op],q.ask==='left'?'付錢以後，錢變多還是變少？錢變少了，要用什麼？':'價錢一樣、買好幾個，可以用乘的；價錢不一樣，要用加的。','判斷算法')){x.judgeRes=x.optRes.op;goPh()}return}
+ if(k==='price'){const a=x.circ.slice().sort().join(),b=q.circles.slice().sort().join();const ok=a===b;x.wrongs.price=x.wrongs.price||0;log('寫價錢',{圈圈:x.circ,正確:ok});
+  if(ok){x.optRes.price=x.wrongs.price?'第二次對':'第一次就對';return goPh()}
+  x.wrongs.price++;if(x.wrongs.price>=2){x.circ=q.circles.slice();x.optRes.price='老師提示';x.msg='跟老師一起看：每個圈圈的價錢是這樣。';x.msgGood=false;render();return}
+  x.circ=x.circ.map(()=>null);x.msg='再看一次：每個東西多少錢？一個圈圈放一個東西的價錢。';x.msgGood=false;return render()}
+ if(k==='write'){const v=+x.entry;x.ansTries.push(x.entry);log('寫數字',{寫的:x.entry,正確:v===q.ans});
+  if(v===q.ans){x.result=x.ansTries.length>1?'再試後寫對':'第一次就寫對';x.msg='寫對了！';x.msgGood=true;return goPh()}
+  x.entry='';if(x.ansTries.length===1){x.msg=q.type==='write'?'再聽一次。百、十、個，要放對格子。':'先數一百元有幾張，寫在「百」；十元有幾個，寫在「十」；一元有幾個，寫在「個」。';x.msgGood=false;if(q.type==='write')speak(q.reading);return render()}
+  x.result='老師提示';x.msg=`答案是 ${q.ans}。`;x.msgGood=false;return goPh()}
+ if(k==='expr'){const [a,o,b]=x.slots;const want=OPSYM[q.op];const nums=q.nums.map(String);
+  const ok=o===want&&(q.op!=='-'?([a,b].sort().join()===nums.slice().sort().join()):(a===nums[0]&&b===nums[1]));
   log('列式',{算式:`${a} ${o} ${b}`,正確:ok});
   if(ok){x.exprOk=true;x.exprRes=x.exprWrong?'改過後對':'自己列對';x.msg='算式排好了！現在可以算了，計算機打開了。';x.msgGood=true;return goPh()}
   x.exprWrong++;x.slots=[null,null,null];
-  if(x.exprWrong===1){x.msg=(o!==want)?`我們剛剛說要用${OPNAME[q.op]}的，符號要用「${want}」。`:'數字的位置再想想：大的數放前面。';x.msgGood=false;return render()}
+  if(x.exprWrong===1){x.msg=(o!==want)?`我們剛剛說要用${OPNAME[q.op]}的，符號要用「${want}」。`:(q.op==='-'?'數字的位置再想想：大的數放前面。':'數字再看一次題目，要用哪兩個數字？');x.msgGood=false;return render()}
   x.slots=[nums[0],want,nums[1]];x.exprOk=true;x.exprRes='老師協助';x.msg='跟老師一起看：算式是這樣排的。';x.msgGood=false;return goPh()}
  if(k==='calc'){const v=+x.entry;x.ansTries.push(v);log('計算答案',{輸入:v,正確:v===q.ans,用了計算機:x.calcUsed});
   if(v===q.ans){x.result=x.ansTries.length>1?'重算後對':'算對';x.msg='算對了！';x.msgGood=true;return goPh()}
@@ -481,14 +487,14 @@ function next(){const s=S[cur];const n=need();if(n)return note(n);if(!s.q){log('
 
 /* ================= 學生操作 ================= */
 function note(m){const b=$('banner');b.textContent=nm(m);b.style.display='block';clearTimeout(note.t);note.t=setTimeout(()=>b.style.display='none',2600)}
-function padKey(k){const q=Q(),x=X(),ph=phKey();if(!['count','calc'].includes(ph))return;
+function padKey(k){const q=Q(),x=X(),ph=phKey();if(!['count','calc','write'].includes(ph))return;
  if(k==='⌫'){x.entry=x.entry.slice(0,-1);return render()}
  if(k==='ok'){if(ph==='count'&&q.type!=='count'){if(!x.entry)return note('先輸入數字喔。');const i=x.chain.length;const want=q.type==='skip'?q.step*(i+1):x.order.slice(0,i+1).reduce((a,j)=>a+q.coins[j],0);const v=+x.entry;
    if(v===want){x.chain.push(v);x.entry='';x.msg='';if(x.chain.length>=(q.type==='skip'?q.n:q.coins.length)){x.msg=`對！總共 ${v} ${q.unit}。按「我做好了」。`;x.msgGood=true;x.result=x.chainWrong?'有錯後改對':'自己數對'}log('接龍',{第幾個:i+1,輸入:v,正確:true});return render()}
    x.chainWrong++;log('接龍',{第幾個:i+1,輸入:v,正確:false});x.entry='';const prev=i?x.chain[i-1]:0;const add=q.type==='skip'?q.step:q.coins[x.order[i]];
    x.msg=x.chainWrong%2===1?'再想想看。':`前面是 ${prev}，再多 ${add}，是多少？`;x.msgGood=false;return render()}
   return next()}
- if(x.entry.length<4){x.entry+=k;render()}}
+ if(x.entry.length<(ph==='write'?3:4)){x.entry+=k;render()}}
 let calcJustEq=false;
 function calcKey(k){const x=X();x.calcUsed=true;
  if(k==='C'){calcDisp='0';calcExpr='';calcJustEq=false;return updCalc()}
@@ -500,9 +506,13 @@ function updCalc(){const d=$('cdsp');if(d)d.textContent=calcDisp}
 
 document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t||t.closest('.panel')||t.closest('.modal'))return;const s=S[cur];if(!s||!s.q)return;const q=s.q,x=s.x,k=phKey();
  if(t.dataset.mic){micStart();return}
+ if(t.dataset.sopt!=null){x.sopt=t.dataset.sopt;log('點選',{選:x.sopt});return render()}
+ if(t.dataset.price){if(k!=='price')return;const i=x.circ.findIndex(v=>v==null);if(i<0)return note('圈圈都放滿了。點圈圈可以拿出來。');x.circ[i]=+t.dataset.price;return render()}
+ if(t.dataset.circ!=null){if(k!=='price')return;x.circ[+t.dataset.circ]=null;return render()}
+ if(t.dataset.listen){x.listen=(x.listen||0)+1;log('聽數字',{第幾次:x.listen});speak(q.reading);return}
  if(t.dataset.saymore){x.sayOpen=true;log('打開口說',{});return render()}
  if(t.dataset.kbd){const v=($('kbdIn')||{}).value||'';if(v.trim())addTry(v.trim(),'鍵盤');return}
- if(t.dataset.calc){const open=q.type==='op'&&q.op!=='none'&&['calc','check'].includes(k);
+ if(t.dataset.calc){const open=q.type==='shop'&&['calc','check'].includes(k);
   if(!open){x.calcEarly++;log('還沒列式就按計算機',{步驟:k});note(q.op==='none'?'這一題不用算，比一比就好。':'先想一想要怎麼算，列好算式，計算機才會打開。');return render()}
   calcOpen=!calcOpen;return render()}
  if(t.dataset.ck){calcKey(t.dataset.ck);return}
@@ -513,7 +523,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t||
  if(t.dataset.opt){x.choice=t.dataset.opt;log('點選',{選:x.choice});return render()}
  if(t.dataset.aopt){x.choice=t.dataset.aopt;return render()}
  if(t.dataset.chk){x.checkPick=t.dataset.chk;return render()}
- if(t.dataset.tile){const i=x.slots.findIndex(v=>v==null);if(i<0)return;const isOp='＋－'.includes(t.dataset.tile);
+ if(t.dataset.tile){const i=x.slots.findIndex(v=>v==null);if(i<0)return;const isOp='＋－×'.includes(t.dataset.tile);
   const slot=isOp?1:(x.slots[0]==null?0:2);if(x.slots[slot]!=null)return note(isOp?'中間已經有符號了，點一下可以拿出來。':'數字的位置已經放滿了。');x.slots[slot]=t.dataset.tile;return render()}
  if(t.dataset.slot){x.slots[+t.dataset.slot]=null;return render()}});
 document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;if(!S[cur]||!S[cur].q)return;
@@ -538,7 +548,6 @@ $('tbtn').onclick=()=>{if(pinOk)return openP();PIN=lsGet('daji-pin','');pinIn=''
 $('pClose').onclick=()=>$('panel').classList.remove('open');
 $('pLock').onclick=()=>{$('panel').classList.remove('open');pinOk=false};
 const LV=['獨立','一次提示','多次提示','一起完成'];
-function qAnswer(q){if(q.type==='op')return q.op==='none'?`不用算；答案：${q.ans}`:`${OPNAME[q.op]}：${q.nums[0]} ${q.op==='+'?'＋':'－'} ${q.nums[1]} ＝ ${q.ans} ${q.unit}`;if(q.type==='unit')return q.ans;return `${q.ans} ${q.unit}`}
 function renderPanel(){const s=S[cur];
  $('pA').innerHTML=Object.entries(A_LV).map(([k,v])=>`<button data-cfa="${k}" class="${CFG.A==k?'on':''}">${v}</button>`).join('');
  $('pB').innerHTML=Object.entries(B_LV).map(([k,v])=>`<button data-cfb="${k}" class="${CFG.B==k?'on':''}">${v}</button>`).join('');
@@ -547,7 +556,7 @@ function renderPanel(){const s=S[cur];
  const q=s.q,x=s.x;
  const tries=x.tries.length?x.tries.map((t,i)=>`${i+1}. ${esc(t.text)}（${t.via}｜${t.ph}）`).join('<br>'):'還沒有說';
  $('pCtx').innerHTML=`<div class="ans">${esc(qLabel(q))}｜${esc(nm(qText(q)))}</div><div class="ans" style="margin-top:6px">答案：${esc(qAnswer(q))}</div>
-  <div class="ans" style="margin-top:6px">判斷：${esc(x.judgeRes||'—')}${x.picks&&x.picks.length?'（選過：'+esc(x.picks.join('、'))+'）':''}｜列式：${esc(x.exprRes||'—')}｜答案：${esc(x.result||'進行中')}${x.ansTries.length?'（輸入過：'+x.ansTries.join('、')+'）':''}｜合理檢查：${esc(x.checkRes||'—')}<br>用了計算機：${x.calcUsed?'是':'否'}｜<b>還沒列式就按計算機：${x.calcEarly} 次</b>${x.chainWrong?'｜接龍錯 '+x.chainWrong+' 次':''}</div>
+  <div class="ans" style="margin-top:6px">判斷：${esc(x.judgeRes||'—')}${x.picks&&x.picks.length?'（選過：'+esc(x.picks.join('、'))+'）':''}｜列式：${esc(x.exprRes||'—')}｜答案：${esc(x.result||'進行中')}${x.ansTries.length?'（輸入過：'+x.ansTries.join('、')+'）':''}｜合理檢查：${esc(x.checkRes||'—')}${Object.keys(x.optRes).length?'<br>各步驟：'+esc(Object.entries(x.optRes).map(([a,b])=>a+' '+b).join('、')):''}<br>用了計算機：${x.calcUsed?'是':'否'}｜<b>還沒列式就按計算機：${x.calcEarly} 次</b>${x.chainWrong?'｜接龍錯 '+x.chainWrong+' 次':''}</div>
   <h4 style="margin-top:8px">他說的（語音辨識）</h4><div class="ans">${tries}</div>
   <div class="row" style="margin-top:6px"><button data-pass="1">算他這一步對，放行</button></div>`;
  $('pLevel').innerHTML=LV.map(l=>`<button data-lv="${l}" class="${levels[s.key]===l?'on':''}">${l}</button>`).join('');
@@ -564,11 +573,11 @@ $('panel').addEventListener('click',e=>{const b=e.target.closest('button');if(!b
   return goPh()}});
 $('pNote').addEventListener('input',e=>{notes[S[cur].key]=e.target.value});
 $('pRe').onclick=()=>{$('mText').textContent='依目前的層級換一組新題目？這次已經做的部分會留在紀錄裡。';$('modal').dataset.act='re';$('modal').style.display='grid'};
-$('pReOne').onclick=()=>{const s=S[cur];if(!s.q)return;const old=s.q;const q=old.strand==='C'?genC(CFG.C[Math.floor(Math.random()*CFG.C.length)]||'len'):makeQ(old.strand,0);s.q=q;s.x=freshX(q);log('老師換題',{原本:qLabel(old),換成:qLabel(q)});render();renderPanel()};
+$('pReOne').onclick=()=>{const s=S[cur];if(!s.q)return;const old=s.q;const q=old.strand==='C'?genC(CFG.C[Math.floor(Math.random()*CFG.C.length)]||'len'):makeQ(old.strand,0,CFG);s.q=q;s.x=freshX(q);log('老師換題',{原本:qLabel(old),換成:qLabel(q)});render();renderPanel()};
 async function renderLog(){const ev=(await allEv()).slice(-40).reverse();$('pLog').innerHTML=ev.map(x=>`<div>${esc(x.ts.slice(5,16))}｜${esc(x.題||'')}｜${esc(x.type)}${Object.keys(x.data).length?'：'+esc(JSON.stringify(x.data).replace(/[{}"]/g,'')):''}</div>`).join('')||'還沒有紀錄'}
 $('pName').value=NAME;$('pNameSave').onclick=()=>{NAME=$('pName').value.trim()||'大吉';lsSet('daji-name',NAME);render()};
 $('pExport').onclick=async()=>{const ev=await allEv();
- const sum=S.filter(s=>s.q).map(s=>{const q=s.q,x=s.x;return {題號:s.key,層級:qLabel(q),題目:nm(qText(q)),答案:qAnswer(q),判斷:x.judgeRes||'',判斷選過:x.picks||[],列式:x.exprRes||'',答案結果:x.result||'未完成',輸入過的答案:x.ansTries,合理檢查:x.checkRes||'',用了計算機:x.calcUsed,還沒列式就按計算機:x.calcEarly,接龍錯誤:x.chainWrong,他說的:x.tries.map(t=>`${t.ph}：${t.text}`),提示程度:levels[s.key]||'',備註:notes[s.key]||''}});
+ const sum=S.filter(s=>s.q).map(s=>{const q=s.q,x=s.x;return {題號:s.key,層級:qLabel(q),題目:nm(qText(q)),答案:qAnswer(q),判斷:x.judgeRes||'',判斷選過:x.picks||[],列式:x.exprRes||'',答案結果:x.result||'未完成',輸入過的答案:x.ansTries,合理檢查:x.checkRes||'',各步驟:x.optRes,各步驟錯誤次數:x.wrongs,圈圈:x.circ,用了計算機:x.calcUsed,還沒列式就按計算機:x.calcEarly,接龍錯誤:x.chainWrong,他說的:x.tries.map(t=>`${t.ph}：${t.text}`),提示程度:levels[s.key]||'',備註:notes[s.key]||''}});
  const out={頁面:'數學小站',匯出時間:now(),出題層級:CFG,今天的題目摘要:sum,全部紀錄:ev};
  const d=new Date();const fn=`math_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.json`;
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,1)],{type:'application/json'}));a.download=fn;document.body.appendChild(a);a.click();a.remove();log('匯出紀錄',{檔名:fn})};
