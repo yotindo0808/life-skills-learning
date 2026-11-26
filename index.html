@@ -6,6 +6,7 @@
 <title>生活自立學習站</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@fontsource/bpmf-iansui@5.3.1/index.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fontsource/iansui@5.3.1/index.css" rel="stylesheet">
 <style>
 /* 大吉學習站｜首頁：列出學生會用到的所有頁面。清單在 pages.json */
 :root{color-scheme:light;--bg:#fbfaf7;--ink:#1f2430;--muted:#5b6170;--left:#e3eef7;--line:#d5dbe3;--accent:#e8772e;--ok:#2f7d5b;--help:#3a6fb0;--warn:#fff4e5}
@@ -15,6 +16,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font:22px/1.5 "Bpmf Iansui",
 .app{min-height:100vh;min-height:100dvh;display:grid;grid-template-rows:72px 1fr auto}
 .top{display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid var(--line);background:#fff}
 .top h1{margin:0;font-size:28px;font-weight:400;-webkit-text-stroke:.3px var(--ink)}
+body.nozy{font-family:"Iansui","Noto Sans TC","PingFang TC",sans-serif}
+.zy{font-family:"Noto Sans TC","PingFang TC",sans-serif;font-size:17px;min-height:44px;background:#fff;border:2px solid var(--line);border-radius:14px;padding:4px 14px;color:var(--ink);cursor:pointer}
+.zy b{color:var(--accent)}
 .today{margin-left:auto;font-size:20px;color:var(--muted)}
 .main{padding:22px 24px 30px;display:grid;gap:22px;align-content:start;max-width:1200px;width:100%;margin:0 auto}
 h2{margin:0 0 10px;font-size:22px;font-weight:400;color:var(--muted)}
@@ -40,7 +44,7 @@ a.card.new{border-color:var(--accent)}
 </head>
 <body>
 <div class="app">
-  <header class="top"><h1 id="hello">我的學習站</h1><div class="today" id="today"></div></header>
+  <header class="top"><h1 id="hello">我的學習站</h1><div class="today" id="today"></div><button class="zy" id="zyBtn"></button></header>
   <main class="main">
     <section><h2>每次都可以做</h2><div class="grid" id="fixed"></div></section>
     <section><h2>上課的頁面</h2><div class="grid" id="lessons"></div></section>
@@ -69,6 +73,9 @@ function draw(data){
  const newest=les.length?les[0].date:'';
  $('lessons').innerHTML=les.map(x=>{const isToday=x.date===TODAY,isNew=x.date===newest;
   return `<a class="card ${isNew?'new':''}" href="${safe(x.href)}"><span class="no"><span><small>第</small><b>${esc(x.no)}</b><small>堂</small></span></span><span><div class="date">${esc(md(x.date))}${isToday?'<span class="badge td">今天</span>':isNew?'<span class="badge">最新</span>':''}</div><div class="t">${esc(x.title)}</div><div class="d">${esc(x.desc)}</div></span></a>`}).join('')||'<div class="d">還沒有課程頁面。</div>'}
+let ZY=true;try{ZY=localStorage.getItem('daji-zhuyin')!=='off'}catch(e){}
+function applyZy(){document.body.classList.toggle('nozy',!ZY);$('zyBtn').innerHTML=ZY?'注音：<b>開</b>':'注音：<b>關</b>'}
+$('zyBtn').onclick=()=>{ZY=!ZY;try{localStorage.setItem('daji-zhuyin',ZY?'on':'off')}catch(e){}applyZy()};applyZy();
 draw(FALLBACK);
 fetch('./pages.json?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject()).then(draw).catch(()=>{if(location.protocol!=='file:')$('err').innerHTML='<div class="err">頁面清單讀取失敗，先顯示備份清單。</div>'});
 </script>

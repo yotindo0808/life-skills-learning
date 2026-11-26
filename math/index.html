@@ -6,12 +6,15 @@
 <title>數學小站｜生活自立學習站</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@fontsource/bpmf-iansui@5.3.1/index.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fontsource/iansui@5.3.1/index.css" rel="stylesheet">
 <style>
 /* 大吉學習站｜數學小站：每次 3 題，先判斷再按計算機。版面與上課頁一致 */
 :root{color-scheme:light;--bg:#fbfaf7;--ink:#1f2430;--muted:#5b6170;--left:#e3eef7;--line:#d5dbe3;--accent:#e8772e;--accent-d:#c45f1d;--ok:#2f7d5b;--help:#3a6fb0;--warn:#fff4e5;--bad:#b3261e}
 *{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:22px/1.5 "Bpmf Iansui","Noto Sans TC","PingFang TC",sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
+body{margin:0;background:var(--bg);color:var(--ink);font:22px/1.5 "Bpmf Iansui","Noto Sans TC","PingFang TC",sans-serif;}
+body.nozy{font-family:"Iansui","Noto Sans TC","PingFang TC",sans-serif}
+body{overflow:hidden;-webkit-user-select:none;user-select:none}
 button{touch-action:manipulation;-webkit-touch-callout:none;font:inherit;color:inherit;border:0;cursor:pointer;border-radius:16px;min-height:56px;padding:10px 22px}
 button:focus-visible{outline:4px solid var(--help);outline-offset:2px}
 button:disabled{opacity:.45;cursor:default}
@@ -23,6 +26,8 @@ button:disabled{opacity:.45;cursor:default}
 .dots{display:flex;gap:6px}
 .dots i{width:12px;height:12px;border-radius:50%;background:var(--line)}
 .dots i.on{background:var(--accent)}.dots i.pd{background:#9fb8cf}
+.zy{font-family:"Noto Sans TC","PingFang TC",sans-serif;min-height:44px;font-size:17px;background:#fff;border:2px solid var(--line);color:var(--ink);padding:4px 14px}
+.zy b{color:var(--accent)}
 .tbtn{font-family:"Noto Sans TC","PingFang TC",sans-serif;min-height:44px;font-size:17px;background:#eef1f5;color:var(--muted);padding:6px 16px}
 .main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:0}
 .left{background:var(--left);padding:20px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px;overflow:auto;text-align:center}
@@ -150,6 +155,7 @@ button:disabled{opacity:.45;cursor:default}
     <span class="tag">練習用</span>
     <div class="title" id="title"></div>
     <div class="dots" id="dots"></div>
+    <button class="zy" id="zyBtn"></button>
     <button class="tbtn" id="tbtn">老師</button>
   </header>
   <main class="main">
@@ -237,7 +243,7 @@ const UNITS={
 function scatter(n){const pts=[];let guard=0;while(pts.length<n&&guard<5000){guard++;const x=6+R()*88,y=8+R()*84;if(pts.every(p=>Math.hypot((p[0]-x)*1.33,p[1]-y)>11))pts.push([x,y])}while(pts.length<n)pts.push([6+R()*88,8+R()*84]);return pts}
 
 function genA(lv){
- if(lv===1){const [e,n,u]=pick(COUNT_ITEMS);const N=ri(23,44);return {strand:'A',level:1,type:'count',emoji:e,name:n,unit:u,N,pts:scatter(N),ans:N,text:`數一數，${n}總共有幾${u}？`,how:'可以點一下做記號。十個圈成一組，比較不會數錯。'}}
+ if(lv===1){const [e,n,u]=pick(COUNT_ITEMS);const N=ri(23,44);return {strand:'A',level:1,type:'count',emoji:e,name:n,unit:u,N,pts:scatter(N),ans:N,text:`數一數，${n}總共有幾${u}？`,how:'數過的點一下做記號。十個一組，比較不會數錯。'}}
  if(lv===2||lv===3){const v=lv===2?10:5,n=ri(4,9);return {strand:'A',level:lv,type:'skip',coin:v,n,step:v,unit:'元',ans:v*n,text:`一個 ${v} 元。${v===10?'十':'五'}元${v===10?'十':'五'}元往上數，總共多少元？`}}
  if(lv===4){const n=ri(4,9);return {strand:'A',level:4,type:'skip',pair:true,n,step:2,unit:'隻',ans:2*n,text:`一雙鞋子有 2 隻。兩隻兩隻往上數，總共有幾隻鞋子？`}}
  const coins=[];if(R()<.7)coins.push(50);for(let i=ri(1,3);i>0;i--)coins.push(10);if(R()<.6)coins.push(5);for(let i=ri(0,3);i>0;i--)coins.push(1);
@@ -306,7 +312,7 @@ function speak(t){try{speechSynthesis.cancel();if(!t)return;const u=new SpeechSy
 function qText(q){return q.seg?q.seg.map(p=>typeof p==='object'?p.n:p).join(''):q.text}
 function promptOf(){const s=S[cur];if(s.key==='flow')return '今天的數學小站有三題。每一題都要先想一想，再算。';if(s.key==='end')return '今天的數學小站完成了！';
  const q=s.q,k=phKey();
- if(k==='judge')return q.type==='unit'?q.text:'要用加的、減的，還是不用算？說說看。';
+ if(k==='judge')return q.type==='unit'?q.text:'要用加的、減的，還是不用算？選一個。';
  if(k==='expr')return '用下面的卡片，排出算式。';
  if(k==='calc')return '算出答案。可以打開計算機。';
  if(k==='check')return q.check.q;
@@ -326,6 +332,7 @@ function micStart(){if(srOn){try{srObj.stop()}catch(e){}return}if(!SR){srFail=tr
 function addTry(t,via){const x=X();x.tries.push({text:t,via,ph:phKey(),ts:now()});log('說',{文字:t,方式:via,步驟:phKey()});render()}
 const micIcon='<svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><rect x="8" y="2" width="8" height="13" rx="4"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
 const lastTry=()=>{const x=X(),k=phKey();const t=x.tries.filter(t=>t.ph===k);return t.length?t[t.length-1]:null};
+function sayMore(label){const x=X();if(!x.sayOpen&&!srOn)return `<button class="opt" data-saymore="1" style="align-self:flex-start;min-height:52px;font-size:20px;padding:0 18px">🎤 ${esc(label)}（可以不說）</button>`;return micBlock('按這裡，說說看')}
 function micBlock(label){const last=lastTry();
  let h=`<button class="mic ${srOn?'on':''}" data-mic="1">${micIcon}${srOn?'說完了':(label||'按這裡，用說的')}</button>`;
  if(srFail)h+=`<div class="sub">請點下面的格子，按鍵盤上的麥克風說，說完按「送出」。</div><div class="kbd"><input id="kbdIn" type="text" autocomplete="off"><button class="opt" data-kbd="1" style="min-height:52px">送出</button></div>`;
@@ -360,11 +367,11 @@ function render(){
   /* ---- A：點數 ---- */
   if(q.type==='count'){
    let g=0;const order=Object.keys(x.marks).map(Number).sort((a,b)=>x.marks[a]-x.marks[b]);const grp={};order.forEach((id,i)=>grp[id]=Math.floor(i/10)%5);
-   L=`<div class="field">${q.pts.map((p,i)=>`<button class="obj ${i in grp?'g'+grp[i]:''}" style="left:${p[0]}%;top:${p[1]}%" data-obj="${i}" aria-label="${esc(q.name)}">${q.emoji}</button>`).join('')}</div><div class="sub">點一下做記號；每十個會換一種顏色。</div>`;
+   L=`<div class="field">${q.pts.map((p,i)=>`<button class="obj ${i in grp?'g'+grp[i]:''}" style="left:${p[0]}%;top:${p[1]}%" data-obj="${i}" aria-label="${esc(q.name)}">${q.emoji}</button>`).join('')}</div><div class="sub">點一下做記號，記號不會消失；每十個會換一種顏色。</div>`;
    Rr+=`<div class="q">${esc(q.text)}</div>`;
    if(k==='look')Rr+=`<div class="sub">${esc(q.how)}</div><div class="sub">數好了，按「我做好了」。</div>`;
    if(k==='count')Rr+=`<div class="sub">總共有幾${esc(q.unit)}？用下面的數字鍵輸入。</div><div class="chain"><div class="box cur">${esc(x.entry)||'&nbsp;'}</div><span>${esc(q.unit)}</span></div>`+padHTML();
-   if(k==='say')Rr+=`<div class="sub">用說的：「總共有＿＿${esc(q.unit)}，我是＿＿個＿＿個數的。」</div>`+micBlock()}
+   if(k==='say')Rr+=`<div class="sub">可以說說看：「總共有＿＿${esc(q.unit)}，我是＿＿個＿＿個數的。」說完或不說，都可以按「我做好了」。</div>`+micBlock()}
   /* ---- A：跳數接龍 ---- */
   if(q.type==='skip'){
    const done=x.chain.length;
@@ -372,7 +379,7 @@ function render(){
      :`<div class="coins">${Array.from({length:q.n},(_,i)=>`<div class="coin c${q.coin} ${i===done&&k==='count'?'now':''} ${i<done?'used':''}" style="position:relative">${q.coin}</div>`).join('')}</div>`;
    Rr+=`<div class="q">${esc(q.text)}</div>`;
    if(k==='count')Rr+=`<div class="sub">一個一個往上數：橘色框的${q.pair?'那一雙':'那一個'}數完，總共是多少？</div><div class="chain">${Array.from({length:q.n},(_,i)=>`<div class="box ${i<done?'ok':i===done?'cur':''}">${i<done?x.chain[i]:i===done?(esc(x.entry)||'&nbsp;'):''}</div>`).join('')}</div>`+padHTML();
-   if(k==='say')Rr+=`<div class="sub">用說的：「總共＿＿${esc(q.unit)}。」</div>`+micBlock()}
+   if(k==='say')Rr+=`<div class="sub">可以說說看：「總共＿＿${esc(q.unit)}。」說完或不說，都可以按「我做好了」。</div>`+micBlock()}
   /* ---- A：混合數錢 ---- */
   if(q.type==='mixed'){
    const ord=x.order;const done=x.chain.length;
@@ -380,30 +387,30 @@ function render(){
    Rr+=`<div class="q">${esc(q.text)}</div>`;
    if(k==='order')Rr+=`<div class="sub">先從大的開始：照順序一個一個點錢。點錯了可以再點一次取消。</div>`;
    if(k==='count')Rr+=`<div class="sub">照你排的順序，一個一個加上去，數到這一個總共多少？</div><div class="chain">${ord.map((_,i)=>`<div class="box ${i<done?'ok':i===done?'cur':''}">${i<done?x.chain[i]:i===done?(esc(x.entry)||'&nbsp;'):''}</div>`).join('')}</div>`+padHTML();
-   if(k==='say')Rr+=`<div class="sub">用說的：「總共＿＿元。」</div>`+micBlock()}
+   if(k==='say')Rr+=`<div class="sub">可以說說看：「總共＿＿元。」說完或不說，都可以按「我做好了」。</div>`+micBlock()}
   /* ---- B：運算判斷 ---- */
   if(q.type==='op'){
    L=goodsHTML(q)+storyHTML(q)+(calcOpen?calcHTML():'');
    if(k==='look')Rr+=`<div class="q">先看左邊的題目。</div><div class="sub">把<b>要用到的數字</b>點一下。</div>`;
-   if(k==='judge'){Rr+=`<div class="q">要用<b>加</b>的、<b>減</b>的，還是<b>不用算</b>？</div><div class="sub">用說的，也說說為什麼。</div>`;
-    if(x.usedOpts){if(!x.shown)x.shown=shuf(['加','減','不用算']);Rr+=`<div class="opts" style="grid-template-columns:repeat(3,minmax(0,1fr))">${x.shown.map(o=>`<button class="opt ${x.choice===o?'sel':''}" data-opt="${o}">${o}</button>`).join('')}</div>`}else Rr+=micBlock()}
+   if(k==='judge'){Rr+=`<div class="q">要用<b>加</b>的、<b>減</b>的，還是<b>不用算</b>？</div><div class="sub">選一個。</div>`;
+    if(!x.shown)x.shown=shuf(['加','減','不用算']);Rr+=`<div class="opts" style="grid-template-columns:repeat(3,minmax(0,1fr))">${x.shown.map(o=>`<button class="opt ${x.choice===o?'sel':''}" data-opt="${o}">${o}</button>`).join('')}</div>`+sayMore('也可以說說看：為什麼？')}
    if(k==='expr'){const tiles=shuf(q.nums.map(String)).concat(['＋','－']);if(!x.tiles)x.tiles=tiles;
     Rr+=`<div class="q">用卡片排出算式。</div><div class="expr">${[0,1,2].map(i=>`<button class="slot ${i===1?'op':''} ${x.slots[i]!=null?'f':''}" data-slot="${i}">${x.slots[i]!=null?x.slots[i]:'&nbsp;'}</button>`).join('')}<span class="eq">＝　？</span></div><div class="sub">點卡片放進去；放錯了，點格子可以拿出來。</div><div class="tiles">${x.tiles.map(t=>`<button class="tile ${'＋－'.includes(t)?'op':''}" data-tile="${t}">${t}</button>`).join('')}</div>`}
    if(k==='calc'){Rr+=`<div class="expr"><div class="slot f">${x.slots[0]}</div><div class="slot f op">${x.slots[1]}</div><div class="slot f">${x.slots[2]}</div><span class="eq">＝</span><div class="box cur" style="min-width:110px">${esc(x.entry)||'&nbsp;'}</div><span>${esc(q.unit)}</span></div><div class="sub">可以心算，也可以按右上角打開計算機。算好了，用數字鍵輸入答案。</div>`+padHTML()}
    if(k==='check'){Rr+=`<div class="expr"><div class="slot f">${x.slots[0]}</div><div class="slot f op">${x.slots[1]}</div><div class="slot f">${x.slots[2]}</div><span class="eq">＝ ${q.ans}</span></div><div class="q">${esc(q.check.q)}</div>`;
     if(!x.cshown)x.cshown=shuf(q.check.opts);Rr+=`<div class="opts">${x.cshown.map(o=>`<button class="opt ${x.checkPick===o?'sel':''}" data-chk="${o}">${o}</button>`).join('')}</div>`}
-   if(k==='answer'){Rr+=`<div class="q">${esc(nm(qText(q)))}</div><div class="sub">先用說的回答。</div>`+micBlock();
-    if(x.ansOpen){if(!x.ashown)x.ashown=shuf(q.ansOpts);Rr+=`<div class="opts">${x.ashown.map(o=>`<button class="opt ${x.choice===o?'sel':''}" data-aopt="${esc(o)}">${esc(o)}</button>`).join('')}</div>`}}
+   if(k==='answer'){Rr+=`<div class="q">${esc(nm(qText(q)))}</div><div class="sub">選一個。</div>`;
+    if(!x.ashown)x.ashown=shuf(q.ansOpts);Rr+=`<div class="opts">${x.ashown.map(o=>`<button class="opt ${x.choice===o?'sel':''}" data-aopt="${esc(o)}">${esc(o)}</button>`).join('')}</div>`+sayMore('也可以說說看')}
    if(k==='why')Rr+=`<div class="q">說說看，你怎麼知道的？</div><div class="sub">例如：「＿＿比＿＿多，所以＿＿。」</div>`+micBlock()}
   /* ---- C：單位 ---- */
   if(q.type==='unit'){
    L=`<div class="thing">${q.emoji}</div><div class="thingname">${esc(q.name)}</div>`+(x.showBench?`<div class="bench">${q.bench.map(b=>`<div>${esc(b)}</div>`).join('')}</div>`:'');
-   if(k==='judge'){Rr+=`<div class="q">${esc(q.text)}</div><div class="sub">這一題<b>不用算</b>，想一想就好。用說的回答。</div>`;
-    if(x.usedOpts){if(!x.shown)x.shown=shuf(q.opts);Rr+=`<div class="opts">${x.shown.map(o=>`<button class="opt ${x.choice===o?'sel':''}" data-opt="${o}">${o}</button>`).join('')}</div>`}else Rr+=micBlock()}
+   if(k==='judge'){Rr+=`<div class="q">${esc(q.text)}</div><div class="sub">這一題<b>不用算</b>，想一想，選一個。</div>`;
+    if(!x.shown)x.shown=shuf(q.opts);Rr+=`<div class="opts" style="grid-template-columns:repeat(${q.opts.length},minmax(0,1fr))">${x.shown.map(o=>`<button class="opt ${x.choice===o?'sel':''}" data-opt="${o}">${o}</button>`).join('')}</div>`+sayMore('也可以說說看：為什麼？')}
    if(k==='why')Rr+=`<div class="q">${esc(q.name)}${esc(q.ask)}，用「${q.ans}」。</div><div class="sub">說說看，為什麼用${q.ans}？</div>`+micBlock()}
  }
  $('left').innerHTML=L;$('right').innerHTML=Rr;
- $('bDone').classList.toggle('off',!!need());$('bBack').disabled=cur===0;
+ $('bDone').classList.toggle('off',!!need());$('bDone').textContent=s.key==='flow'?'我準備好了':'我做好了';$('bBack').disabled=cur===0;
  if($('panel').classList.contains('open'))renderPanel()}
 
 /* ================= 進度把關 ================= */
@@ -412,12 +419,12 @@ function need(){const s=S[cur];if(srOn)return '先說完喔。';if(!s.q)return '
  if(k==='look'){if(q.type==='count')return Object.keys(x.marks).length?'':'先點一點，做記號數一數喔。';const need=q.seg.map((p,i)=>typeof p==='object'&&p.need?i:-1).filter(i=>i>-1);return need.every(i=>x.hits.includes(i))?'':'先把要用到的數字都點一下喔。'}
  if(k==='count'){if(q.type==='count')return x.entry?'':'先輸入你數的數字喔。';const total=q.type==='skip'?q.n:q.coins.length;return x.chain.length>=total?'':'一個一個數完喔。'}
  if(k==='order')return x.order.length===q.coins.length?'':'把每一個錢都照順序點一下喔。';
- if(k==='judge')return x.usedOpts?(x.choice?'':'先選一個喔。'):(said?'':'先按藍色按鈕，用說的喔。');
+ if(k==='judge')return x.choice?'':'先選一個喔。';
  if(k==='expr')return x.slots.every(v=>v!=null)?'':'先把算式排好喔。';
  if(k==='calc')return x.entry?'':'先輸入答案喔。';
  if(k==='check')return x.checkPick?'':'先選一個喔。';
- if(k==='answer')return x.ansOpen?(x.choice?'':'先選一個喔。'):(said?'':'先按藍色按鈕，用說的喔。');
- if(k==='say'||k==='why')return said?'':'先按藍色按鈕，用說的喔。';
+ if(k==='answer')return x.choice?'':'先選一個喔。';
+ if(k==='say'||k==='why')return '';
  return ''}
 
 function goPh(){const x=X();x.ph++;x.msg='';x.msgGood=false;x.choice=null;x.entry='';
@@ -431,27 +438,23 @@ function next(){const s=S[cur];const n=need();if(n)return note(n);if(!s.q){log('
  if(k==='count'){
   if(q.type==='count'){const v=+x.entry;x.ansTries.push(v);log('數的結果',{輸入:v,正確:v===q.ans});
    if(v===q.ans){x.result=x.countWrong?'重數後對':'自己數對';x.msg='數對了！';x.msgGood=true;return goPh()}
-   x.countWrong++;x.entry='';if(x.countWrong===1){x.marks={};x.msg='再數一次。這次十個十個做記號，比較不會數錯。';x.msgGood=false;return render()}
+   x.countWrong++;x.entry='';if(x.countWrong===1){x.marks={};x.ph=0;x.msg='記號清掉了，從頭再數一次。這次十個一組做記號，比較不會數錯。';x.msgGood=false;return render()}
    x.result='老師協助';x.msg=`答案是 ${q.ans}${q.unit}。跟老師一起再數一次。`;x.msgGood=false;return goPh()}
   return goPh()}
  if(k==='order'){const vals=x.order.map(i=>q.coins[i]);const ok=vals.every((v,i)=>i===0||v<=vals[i-1]);log('排順序',{順序:vals,從大到小:ok});
   if(!ok){x.orderWrong=(x.orderWrong||0)+1;x.order=[];x.msg='要先點大的錢，再點小的錢。再排一次。';x.msgGood=false;return render()}return goPh()}
  if(k==='judge'){
-  if(q.type==='unit'){const u=x.usedOpts?x.choice:detectUnit(q,t.text);
-   if(!x.usedOpts&&!u){x.msg='有說到單位嗎？說「毫米」「公分」這樣的名稱。';return render()}
-   const ok=u===q.ans;log('判斷單位',{說的:x.usedOpts?'':t.text,選的:x.usedOpts?x.choice:'',判斷:u,正確:ok});
-   if(ok){x.judgeRes=x.usedOpts?'用選項對':x.judgeWrong?'看提示後說對':'自己說對';x.msg='對！';x.msgGood=true;return goPh()}
-   x.judgeWrong++;if(x.usedOpts){x.judgeRes='用選項後仍錯';x.msg=`要用「${q.ans}」。`;x.msgGood=false;return goPh()}
-   if(x.judgeWrong===1){x.showBench=true;x.msg='再想一想。看看左邊的提示，再說一次。';x.msgGood=false;return render()}
-   x.usedOpts=true;x.msg='選一個看看。';log('打開選項',{});return render()}
-  const said=x.usedOpts?({'加':'+','減':'-','不用算':'none'})[x.choice]:detectOp(t.text);
-  if(!x.usedOpts&&(!said||said==='?')){x.msg='說清楚一點：要用加的、減的，還是不用算？';return render()}
-  const ok=said===q.op;log('判斷算法',{說的:x.usedOpts?'':t.text,選的:x.usedOpts?x.choice:'',判斷:OPNAME[said],正確:ok});
-  if(ok){x.judgeRes=x.usedOpts?'用選項對':x.judgeWrong?'重讀後說對':'自己說對';x.msg=`對，${q.op==='none'?'這一題不用算，比一比就知道':'要用'+OPNAME[q.op]+'的'}。`;x.msgGood=true;return goPh()}
+  const spoken=x.tries.filter(t=>t.ph==='judge').map(t=>t.text);x.picks=(x.picks||[]).concat(x.choice);
+  if(q.type==='unit'){const ok=x.choice===q.ans;log('判斷單位',{選的:x.choice,第幾次:x.picks.length,正確:ok,說的:spoken});
+   if(ok){x.judgeRes=x.judgeWrong?'看提示後選對':'第一次就選對';x.msg='對！';x.msgGood=true;return goPh()}
+   x.judgeWrong++;if(x.judgeWrong>=2){x.judgeRes='老師提示';x.msg=`要用「${q.ans}」。`;x.msgGood=false;return goPh()}
+   x.showBench=true;x.choice=null;x.shown=null;x.msg='再想一想。看看左邊的提示，再選一次。';x.msgGood=false;return render()}
+  const said=({'加':'+','減':'-','不用算':'none'})[x.choice];
+  const ok=said===q.op;log('判斷算法',{選的:x.choice,第幾次:x.picks.length,正確:ok,說的:spoken});
+  if(ok){x.judgeRes=x.judgeWrong?'重讀後選對':'第一次就選對';x.msg=`對，${q.op==='none'?'這一題不用算，比一比就知道':'要用'+OPNAME[q.op]+'的'}。`;x.msgGood=true;return goPh()}
   x.judgeWrong++;
-  if(x.usedOpts){x.judgeRes='用選項後仍錯';x.msg=`這一題要用「${OPNAME[q.op]}」。想想看為什麼。`;x.msgGood=false;return goPh()}
-  if(x.judgeWrong===1){x.msg='再讀一次題目，想一想：東西變多了、變少了，還是比一比就好？';x.msgGood=false;speak(qText(q));return render()}
-  x.usedOpts=true;x.msg='選一個看看。';log('打開選項',{});return render()}
+  if(x.judgeWrong>=2){x.judgeRes='老師提示';x.msg=`這一題要用「${OPNAME[q.op]}」。想想看為什麼。`;x.msgGood=false;return goPh()}
+  x.choice=null;x.shown=null;x.msg='再讀一次題目，想一想：東西變多了、變少了，還是比一比就好？';x.msgGood=false;speak(qText(q));return render()}
  if(k==='expr'){const [a,o,b]=x.slots;const want=q.op==='+'?'＋':'－';const nums=q.nums.map(String);
   const ok=o===want&&(q.op==='+'?([a,b].sort().join()===nums.slice().sort().join()):(a===nums[0]&&b===nums[1]));
   log('列式',{算式:`${a} ${o} ${b}`,正確:ok});
@@ -468,12 +471,12 @@ function next(){const s=S[cur];const n=need();if(n)return note(n);if(!s.q){log('
   if(x.checkTries===1){x.checkPick=null;x.msg='再想想：東西是變多了，還是變少了？';x.msgGood=false;return render()}
   x.checkRes='老師提示';x.msg=`是「${q.check.ans}」。`;x.msgGood=false;return goPh()}
  if(k==='answer'){
-  if(x.ansOpen){const ok=x.choice===q.ans;log('回答（選項）',{選:x.choice,正確:ok});x.result=ok?'用選項答對':'用選項答錯';x.msg=ok?'對了！':`答案是「${q.ans}」。`;x.msgGood=ok;return goPh()}
-  const tt=clean(t.text);const ok=tt.includes(q.ans)&&!(q.ans==='夠'&&tt.includes('不夠'));log('回答（說）',{說的:t.text,正確:ok});
-  if(ok){x.result='自己說對';x.msg='對了！';x.msgGood=true;return goPh()}
-  x.ansOpen=true;x.usedOpts=true;x.msg='再想想，選一個看看。';x.msgGood=false;return render()}
- if(k==='say'){const ok=numsIn(t.text).includes(q.ans);log('說出答案',{說的:t.text,有說到正確數字:ok});x.sayRes=ok?'說對':'沒說到正確數字';return goPh()}
- if(k==='why'){log('說理由',{說的:t.text});return goPh()}
+  const ok=x.choice===q.ans;x.aTries=(x.aTries||0)+1;log('回答',{選:x.choice,第幾次:x.aTries,正確:ok,說的:x.tries.filter(t=>t.ph==='answer').map(t=>t.text)});
+  if(ok){x.result=x.aTries===1?'第一次就選對':'再想後選對';x.msg='對了！';x.msgGood=true;return goPh()}
+  if(x.aTries>=2){x.result='老師提示';x.msg=`答案是「${q.ans}」。`;x.msgGood=false;return goPh()}
+  x.choice=null;x.ashown=null;x.msg='再看一次數字，比一比，再選一次。';x.msgGood=false;return render()}
+ if(k==='say'){if(!t){log('沒有說',{});return goPh()}const ok=numsIn(t.text).includes(q.ans);log('說出答案',{說的:t.text,有說到正確數字:ok});x.sayRes=ok?'說對':'沒說到正確數字';return goPh()}
+ if(k==='why'){log('說理由',{說的:t?t.text:'（沒有說）'});return goPh()}
  goPh()}
 
 /* ================= 學生操作 ================= */
@@ -497,6 +500,7 @@ function updCalc(){const d=$('cdsp');if(d)d.textContent=calcDisp}
 
 document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t||t.closest('.panel')||t.closest('.modal'))return;const s=S[cur];if(!s||!s.q)return;const q=s.q,x=s.x,k=phKey();
  if(t.dataset.mic){micStart();return}
+ if(t.dataset.saymore){x.sayOpen=true;log('打開口說',{});return render()}
  if(t.dataset.kbd){const v=($('kbdIn')||{}).value||'';if(v.trim())addTry(v.trim(),'鍵盤');return}
  if(t.dataset.calc){const open=q.type==='op'&&q.op!=='none'&&['calc','check'].includes(k);
   if(!open){x.calcEarly++;log('還沒列式就按計算機',{步驟:k});note(q.op==='none'?'這一題不用算，比一比就好。':'先想一想要怎麼算，列好算式，計算機才會打開。');return render()}
@@ -504,7 +508,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t||
  if(t.dataset.ck){calcKey(t.dataset.ck);return}
  if(t.dataset.pad){padKey(t.dataset.pad);return}
  if(t.dataset.num!=null&&t.classList.contains('num')){if(k!=='look')return;const i=+t.dataset.num;x.hits=x.hits.includes(i)?x.hits.filter(v=>v!==i):x.hits.concat(i);log('點數字',{數字:q.seg[i].n});return render()}
- if(t.dataset.obj!=null){if(k!=='look'&&!(k==='count'&&q.type==='count'))return;const i=+t.dataset.obj;if(i in x.marks)delete x.marks[i];else x.marks[i]=Date.now()+Math.random();return render()}
+ if(t.dataset.obj!=null){if(k!=='look'&&!(k==='count'&&q.type==='count'))return;const i=+t.dataset.obj;if(i in x.marks)return;x.marks[i]=Date.now()+Math.random();return render()}
  if(t.dataset.coin!=null){if(k!=='order')return;const i=+t.dataset.coin;x.order=x.order.includes(i)?x.order.filter(v=>v!==i):x.order.concat(i);return render()}
  if(t.dataset.opt){x.choice=t.dataset.opt;log('點選',{選:x.choice});return render()}
  if(t.dataset.aopt){x.choice=t.dataset.aopt;return render()}
@@ -543,7 +547,7 @@ function renderPanel(){const s=S[cur];
  const q=s.q,x=s.x;
  const tries=x.tries.length?x.tries.map((t,i)=>`${i+1}. ${esc(t.text)}（${t.via}｜${t.ph}）`).join('<br>'):'還沒有說';
  $('pCtx').innerHTML=`<div class="ans">${esc(qLabel(q))}｜${esc(nm(qText(q)))}</div><div class="ans" style="margin-top:6px">答案：${esc(qAnswer(q))}</div>
-  <div class="ans" style="margin-top:6px">判斷：${esc(x.judgeRes||'—')}${x.usedOpts?'（有用選項）':''}｜列式：${esc(x.exprRes||'—')}｜答案：${esc(x.result||'進行中')}${x.ansTries.length?'（輸入過：'+x.ansTries.join('、')+'）':''}｜合理檢查：${esc(x.checkRes||'—')}<br>用了計算機：${x.calcUsed?'是':'否'}｜<b>還沒列式就按計算機：${x.calcEarly} 次</b>${x.chainWrong?'｜接龍錯 '+x.chainWrong+' 次':''}</div>
+  <div class="ans" style="margin-top:6px">判斷：${esc(x.judgeRes||'—')}${x.picks&&x.picks.length?'（選過：'+esc(x.picks.join('、'))+'）':''}｜列式：${esc(x.exprRes||'—')}｜答案：${esc(x.result||'進行中')}${x.ansTries.length?'（輸入過：'+x.ansTries.join('、')+'）':''}｜合理檢查：${esc(x.checkRes||'—')}<br>用了計算機：${x.calcUsed?'是':'否'}｜<b>還沒列式就按計算機：${x.calcEarly} 次</b>${x.chainWrong?'｜接龍錯 '+x.chainWrong+' 次':''}</div>
   <h4 style="margin-top:8px">他說的（語音辨識）</h4><div class="ans">${tries}</div>
   <div class="row" style="margin-top:6px"><button data-pass="1">算他這一步對，放行</button></div>`;
  $('pLevel').innerHTML=LV.map(l=>`<button data-lv="${l}" class="${levels[s.key]===l?'on':''}">${l}</button>`).join('');
@@ -564,7 +568,7 @@ $('pReOne').onclick=()=>{const s=S[cur];if(!s.q)return;const old=s.q;const q=old
 async function renderLog(){const ev=(await allEv()).slice(-40).reverse();$('pLog').innerHTML=ev.map(x=>`<div>${esc(x.ts.slice(5,16))}｜${esc(x.題||'')}｜${esc(x.type)}${Object.keys(x.data).length?'：'+esc(JSON.stringify(x.data).replace(/[{}"]/g,'')):''}</div>`).join('')||'還沒有紀錄'}
 $('pName').value=NAME;$('pNameSave').onclick=()=>{NAME=$('pName').value.trim()||'大吉';lsSet('daji-name',NAME);render()};
 $('pExport').onclick=async()=>{const ev=await allEv();
- const sum=S.filter(s=>s.q).map(s=>{const q=s.q,x=s.x;return {題號:s.key,層級:qLabel(q),題目:nm(qText(q)),答案:qAnswer(q),判斷:x.judgeRes||'',用了選項:x.usedOpts,列式:x.exprRes||'',答案結果:x.result||'未完成',輸入過的答案:x.ansTries,合理檢查:x.checkRes||'',用了計算機:x.calcUsed,還沒列式就按計算機:x.calcEarly,接龍錯誤:x.chainWrong,他說的:x.tries.map(t=>`${t.ph}：${t.text}`),提示程度:levels[s.key]||'',備註:notes[s.key]||''}});
+ const sum=S.filter(s=>s.q).map(s=>{const q=s.q,x=s.x;return {題號:s.key,層級:qLabel(q),題目:nm(qText(q)),答案:qAnswer(q),判斷:x.judgeRes||'',判斷選過:x.picks||[],列式:x.exprRes||'',答案結果:x.result||'未完成',輸入過的答案:x.ansTries,合理檢查:x.checkRes||'',用了計算機:x.calcUsed,還沒列式就按計算機:x.calcEarly,接龍錯誤:x.chainWrong,他說的:x.tries.map(t=>`${t.ph}：${t.text}`),提示程度:levels[s.key]||'',備註:notes[s.key]||''}});
  const out={頁面:'數學小站',匯出時間:now(),出題層級:CFG,今天的題目摘要:sum,全部紀錄:ev};
  const d=new Date();const fn=`math_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.json`;
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,1)],{type:'application/json'}));a.download=fn;document.body.appendChild(a);a.click();a.remove();log('匯出紀錄',{檔名:fn})};
@@ -572,6 +576,10 @@ $('pClear').onclick=()=>{$('mText').textContent='確定要清除這台 iPad 上�
 $('mNo').onclick=()=>$('modal').style.display='none';
 $('mYes').onclick=async()=>{const act=$('modal').dataset.act;$('modal').style.display='none';if(act==='clear'){await clearAll();renderPanel()}else{log('換一組新題目',{});buildDay(true);render();renderPanel()}};
 
+let ZY=lsGet('daji-zhuyin','on')!=='off';
+function applyZy(){document.body.classList.toggle('nozy',!ZY);$('zyBtn').innerHTML=ZY?'注音：<b>開</b>':'注音：<b>關</b>';$('zyBtn').setAttribute('aria-label',ZY?'注音開著，按一下關掉':'注音關著，按一下打開')}
+$('zyBtn').onclick=()=>{ZY=!ZY;lsSet('daji-zhuyin',ZY?'on':'off');log('切換注音',{注音:ZY?'開':'關'});applyZy()};
+applyZy();
 openDB().then(()=>log('打開數學小站',{層級:CFG}));buildDay(false);render();
 </script>
 </body>
